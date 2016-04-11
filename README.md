@@ -7,6 +7,7 @@ This project indents to implement real time JSON data communication between brow
 
 In order to communicate directly between browsers one has to establish WebRTC-sockets through signalling managed by some central server. Put simply: The browsers has to be able to adress each other.
 
+```
         WebRTC
 Browser ------ Browser
 |              |
@@ -14,7 +15,7 @@ Browser ------ Browser
  \ WebSockets /
   \          /
      Server
-	 
+```	 
 
 Specifically this will be achieved through a server written in Clojure using the following libraries:
 
