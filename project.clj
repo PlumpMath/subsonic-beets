@@ -16,7 +16,8 @@
                  [reagent-forms "0.5.22"]
                  [reagent-utils "0.1.7"]
                  [hiccup "1.0.5"]
-                 [bidi "2.0.6"]]
+                 [secretary "1.2.3"]
+                 [venantius/accountant "0.1.7"]]
 
   :plugins [[lein-environ "1.0.2"]
             [lein-cljsbuild "1.1.1"]
