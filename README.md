@@ -1,5 +1,7 @@
 # WebRTClojure
 
+[![Build Status](https://travis-ci.org/Rovanion/WebRTClojure.svg?branch=master)](https://travis-ci.org/Rovanion/WebRTClojure)
+
 This project indents to implement real time JSON data communication between browsers.
 
 
