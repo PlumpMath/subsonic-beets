@@ -1,0 +1,16 @@
+{
+  "name": "WebRTClojure",
+  "description": "A system for real time communications between browsers",
+  "scripts": {
+  },
+  "env": {
+  },
+  "addons": [
+
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/clojure"
+    }
+  ]
+}
