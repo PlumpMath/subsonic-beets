@@ -5,19 +5,19 @@
             :url "http://www.gnu.org/licenses/agpl-3.0.html"}
 
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [ring-server "0.4.0"]
-                 [ring "1.4.0"]
-                 [ring/ring-defaults "0.2.0"]
-                 [yogthos/config "0.8"]
+                 [ring-server "0.4.0"]          ; Library for starting a web server.
+                 [ring/ring-core "1.4.0"]       ; HTTP abstraction library.
+                 [ring/ring-defaults "0.2.0"]   ; Middleware collection.
+                 [yogthos/config "0.8"]         ; Managing environment configuration.
                  [org.clojure/clojurescript "1.8.40"
                   :scope "provided"]
-                 [reagent "0.5.1"
+                 [reagent "0.5.1"               ; React abstraction.
                   :exclusions [org.clojure/tools.reader]]
                  [reagent-forms "0.5.22"]
                  [reagent-utils "0.1.7"]
-                 [hiccup "1.0.5"]
-                 [secretary "1.2.3"]
-                 [venantius/accountant "0.1.7"]]
+                 [secretary "1.2.3"]            ; Client side routing.
+                 [venantius/accountant "0.1.7"] ; Managing the URL bar in the browser.
+                 [com.taoensso/sente "1.8.1"]]  ; WebSockets manager.
 
   :plugins [[lein-environ "1.0.2"]
             [lein-cljsbuild "1.1.1"]
@@ -53,7 +53,8 @@
                                         :pretty-print  true}}}}
 
 
-  :profiles {:dev {:repl-options {:init-ns webrtclojure.repl}
+  :profiles {:dev {:repl-options {:init-ns webrtclojure.repl
+                                  :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
 
                    :dependencies [[ring/ring-mock "0.3.0"]
                                   [ring/ring-devel "1.4.0"]
@@ -70,6 +71,7 @@
                                                 org.clojure/tools.analyzer.jvm]]
                                   [org.clojure/tools.nrepl "0.2.12"]
                                   [com.cemerick/piggieback "0.2.1"]
+                                  [figwheel-sidecar "0.5.0-2"]
                                   [pjstadig/humane-test-output "0.8.0"]
                                   ]
 
