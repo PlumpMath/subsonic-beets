@@ -1,16 +1,12 @@
 {
-  "name": "WebRTClojure",
-  "description": "A system for real time communications between browsers",
-  "scripts": {
-  },
-  "env": {
-  },
-  "addons": [
-
-  ],
-  "buildpacks": [
-    {
+	"name": "WebRTClojure",
+	"description": "A system for real time communications between browsers",
+	"repository": "https://github.com/Rovanion/WebRTClojure",
+	"keywords": ["clojure", "WebRTC"],
+	"scripts": {},
+  "env": {},
+  "addons": [],
+  "buildpacks": [{
       "url": "heroku/clojure"
-    }
-  ]
+  }]
 }
