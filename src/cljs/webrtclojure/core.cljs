@@ -2,7 +2,8 @@
     (:require [reagent.core :as reagent :refer [atom]]
               [reagent.session :as session]
               [secretary.core :as secretary]
-              [accountant.core :as accountant]))
+              [accountant.core :as accountant]
+              [taoensso.sente  :as sente :refer (cb-success?)]))
 
 ;; -------------------------
 ;; Views
@@ -43,3 +44,17 @@
        (secretary/locate-route path))})
   (accountant/dispatch-current!)
   (mount-root))
+
+
+;; ------------------------
+;; Sente
+
+(let [{:keys [chsk ch-recv send-fn state]}
+      (sente/make-channel-socket! "/sente" ; Note the same path as before
+                                  {:type :auto ; e/o #{:auto :ajax :ws}
+                                   })]
+  (def chsk       chsk)
+  (def ch-chsk    ch-recv) ; ChannelSocket's receive channel
+  (def chsk-send! send-fn) ; ChannelSocket's send API fn
+  (def chsk-state state)   ; Watchable, read-only atom
+  )
