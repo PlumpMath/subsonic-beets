@@ -12,6 +12,7 @@
    [ring/ring-defaults "0.2.0"]        ; Middleware collection.
    [yogthos/config "0.8"]              ; Managing environment configuration.
    [compojure "1.5.0"]                 ; Routing.
+   [http-kit "2.1.19"]                 ; Our web server.
 
    [org.clojure/clojurescript "1.8.40"
     :scope "provided"]
