@@ -3,10 +3,13 @@
               [reagent.session :as session]
               [secretary.core :as secretary]
               [accountant.core :as accountant]
-              [taoensso.sente  :as sente :refer (cb-success?)]))
+              [taoensso.sente  :as sente]
+              [ajax.core :refer [GET POST]] ; Only for testing
+              [webrtclojure.server-comms :as server-comms]
+              ))
 
-;; -------------------------
-;; Views
+;;; -------------------------
+;;; Views
 
 (defn home-page []
   [:div [:h2 "Welcome to webrtclojure"]
@@ -19,8 +22,8 @@
 (defn current-page []
   [:div [(session/get :current-page)]])
 
-;; -------------------------
-;; Routes
+;;; -------------------------
+;;; Routes
 
 (secretary/defroute "/" []
   (session/put! :current-page #'home-page))
@@ -28,8 +31,8 @@
 (secretary/defroute "/about" []
   (session/put! :current-page #'about-page))
 
-;; -------------------------
-;; Initialize app
+;;; -------------------------
+;;; Initialize app
 
 (defn mount-root []
   (reagent/render [current-page] (.getElementById js/document "app")))
@@ -45,16 +48,6 @@
   (accountant/dispatch-current!)
   (mount-root))
 
+(defonce is-router-started? (server-comms/start-router!))
 
-;; ------------------------
-;; Sente
-
-(let [{:keys [chsk ch-recv send-fn state]}
-      (sente/make-channel-socket! "/sente" ; Note the same path as before
-                                  {:type :auto ; e/o #{:auto :ajax :ws}
-                                   })]
-  (def chsk       chsk)
-  (def ch-chsk    ch-recv) ; ChannelSocket's receive channel
-  (def chsk-send! send-fn) ; ChannelSocket's send API fn
-  (def chsk-state state)   ; Watchable, read-only atom
-  )
+(GET "/broadcast") ; Trigger a sente broadcast

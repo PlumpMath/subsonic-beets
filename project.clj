@@ -21,8 +21,10 @@
    [reagent-utils "0.1.7"]
    [secretary "1.2.3"]                 ; Client side routing.
    [venantius/accountant "0.1.7"]      ; Managing the URL bar in the browser.
-   [com.taoensso/sente "1.8.1"]]       ; WebSockets manager.
+   [com.taoensso/sente "1.8.1"]        ; WebSockets manager.
 
+   [cljs-ajax "0.5.4"]                 ; Testing purposes only.
+   ]
   :plugins [[lein-environ "1.0.2"]
             [lein-cljsbuild "1.1.1"]
             [lein-asset-minifier "0.2.7"
