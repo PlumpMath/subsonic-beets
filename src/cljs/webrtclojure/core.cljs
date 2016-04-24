@@ -6,6 +6,7 @@
               [taoensso.sente  :as sente]
               [ajax.core :refer [GET POST]] ; Only for testing
               [webrtclojure.server-comms :as server-comms]
+              [webrtclojure.webrtc :as webrtc]
               ))
 
 ;;; -------------------------
@@ -16,6 +17,7 @@
    [:div [:a {:href "/about"} "go to about page"]]])
 
 (defn about-page []
+  (server-comms/channel-send! [::about])
   [:div [:h2 "About webrtclojure"]
    [:div [:a {:href "/"} "go to the home page"]]])
 
@@ -50,4 +52,18 @@
 
 (defonce is-router-started? (server-comms/start-router!))
 
-(GET "/broadcast") ; Trigger a sente broadcast
+
+;;; -------------------------
+;;; Signaling and data management
+
+(defn onsignalingstatechange! [state]
+    (.debug js/console "Signaling state change: %s" state))
+
+(defn oniceconnectionstatechange! [state]
+    (.debug js/console "Ice connection state change: %s" state))
+
+(defn onicegatheringstatechange! [state]
+    (.debug js/console "Ice gathering state change: %s" state))
+
+;; Set up webrtc
+(webrtc/create-data-connection! )

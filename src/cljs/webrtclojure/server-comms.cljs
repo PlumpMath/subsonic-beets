@@ -50,7 +50,7 @@
 
 (defmethod -message-handler :webrtclojure/broadcast
   [{:as ev-msg :keys [?data]}]
-  (.debug js/console "We received a broadcast: %s" ev-msg))
+  (.debug js/console "We received a broadcast" ev-msg))
 
 
 ;;; -------------------------
@@ -62,4 +62,4 @@
 (defn start-router! []
   (stop-router!)
   (reset! router
-          (sente/start-client-chsk-router! receive-channel message-handler)))
+          (sente/start-chsk-router! receive-channel message-handler)))
