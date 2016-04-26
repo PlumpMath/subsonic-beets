@@ -66,4 +66,6 @@
     (.debug js/console "Ice gathering state change: %s" state))
 
 ;; Set up webrtc
-(webrtc/create-data-connection! )
+(webrtc/create-data-connection!)
+
+(GET "/restart-sente-router")

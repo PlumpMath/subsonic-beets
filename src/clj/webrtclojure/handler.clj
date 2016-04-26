@@ -35,18 +35,9 @@
   [{:as ev-msg :keys [event]}]
   (println "Unhandled event: %s" event))
 
-(defmethod -message-handler :chsk/state
-  ;; Indicates when Sente is ready client-side.
-  [{:keys [?data]}]
-  (if (= ?data {:first-open? true})
-    (println "Channel socket successfully established!")
-    (println "Channel socket state change: %s" ?data)))
-
-(defmethod -message-handler :chsk/handshake
-  ;; Handshake for WS
-  [{:keys [?data]}]
-  (let [[?uid] ?data]
-    (println "Handshake done for: %s" ?uid)))
+(defmethod -message-handler :chsk/ws-ping [something] ; Ping from clients
+  (println "We got a ws-ping")
+  )
 
 ;;; Application specific routes
 (defmethod -message-handler :webrtclojure/signal
@@ -77,8 +68,9 @@
 
   (GET "/broadcast" [] (broadcast! 9001 connected-uids channel-send!)(broadcast! 9001 :sente/all-users-without-uid channel-send!))
 
+  (GET "/restart-sente-router" [] (start-router!))
+
   (resources "/")
   (not-found "Not Found"))
 
 (def app (wrap-middleware #'routes))
-
