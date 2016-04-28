@@ -51,10 +51,17 @@
 ;;; Application specific routes
 (defmethod -message-handler :webrtclojure/signal
   [{:as ev-msg :keys [?data]}]
-  (println "Server received a broadcast: %s" :ev-msg)
-  (println ev-msg)
-  (broadcast! :ev-msg connected-uids channel-send!))
+  (println "Server received a signal: %s" :event)
+  (broadcast! :webrtclojure/offer (get-in (:event ev-msg) [1] )   ;; get data from event
+                                  connected-uids 
+                                  channel-send!))
 
+(defmethod -message-handler :webrtclojure/answer
+  [{:as ev-msg :keys [?data]}]
+  (println "Server received a answer: %s" :event)
+  (broadcast! :webrtclojure/offer (get-in (:event ev-msg) [1] )   ;; get data from event
+                                  connected-uids 
+                                  channel-send!))
 ;;; -------------------------
 ;;; Router lifecycle.
 
@@ -76,6 +83,7 @@
   (POST "/sente" req (ring-ajax-post                req))
 
   (GET "/broadcast" [] (broadcast! 9001 connected-uids channel-send!)(broadcast! 9001 :sente/all-users-without-uid channel-send!))
+  (GET "/reset" [] (start-router!))
 
   (resources "/")
   (not-found "Not Found"))

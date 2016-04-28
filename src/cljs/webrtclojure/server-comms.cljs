@@ -13,8 +13,30 @@
   (def receive-channel ch-recv) ; ChannelSocket's receive channel.
   (def channel-send!   send-fn) ; ChannelSocket's send API fn.
   (def channel-state   state)   ; Watchable, read-only atom.
-  )
+)
 
+;;; -------------------------
+;;; Message handers for application routes
+(def handle-broadcast   nil)
+(def handle-offer       nil)
+(def handle-answer      nil)
+
+(defn set-message-handlers! 
+  "Sets messages handlers:
+  :broadcast  ; Broadcast message handler
+  :offer      ; Offer message handler"
+  [& {:keys [broadcast offer answer]
+      :as   opts
+      :or   {broadcast       nil
+             offer           nil
+             answer          nil}}] 
+  {:pre  [(not (nil? broadcast))
+          (not (nil? offer))
+          (not (nil? answer))]}
+  
+  (set! handle-broadcast broadcast)
+  (set! handle-offer offer)
+  (set! handle-answer answer))
 
 ;;; -------------------------
 ;;; Routes
@@ -45,12 +67,37 @@
   (let [[?uid] ?data]
     (.debug js/console "Handshake done for: %s" ?uid)))
 
-
 ;;; Application specific routes
 
 (defmethod -message-handler :webrtclojure/broadcast
   [{:as ev-msg :keys [?data]}]
-  (.debug js/console "We received a broadcast" ev-msg))
+  ;; Parse the SDP object
+  (def data (.parse js/JSON (get-in (:event ev-msg) [1])))
+  
+  ;; Process the broadcast
+  (handle-offer data))
+
+(defmethod -message-handler :webrtclojure/offer
+  [{:as ev-msg :keys [?data]}]
+  ;; Verify that we are not singaling our self
+  ;; Or move it to sever to not send to sender.
+
+  ;; Parse the SDP object
+  (def offer-sdp (.parse js/JSON (get-in (:event ev-msg) [1 :sdp])))
+  
+  ;; Process the offer
+  (handle-offer offer-sdp))
+
+(defmethod -message-handler :webrtclojure/answer
+  [{:as ev-msg :keys [?data]}]
+  ;; Verify that we are not singaling our self
+  ;; Or move it to sever to not send to sender.
+
+  ;; Parse the SDP object
+  (def answer-sdp (.parse js/JSON (get-in (:event ev-msg) [1 :sdp])))
+  
+  ;; Process the answer
+  (handle-answer answer-sdp))
 
 
 ;;; -------------------------

@@ -50,20 +50,6 @@
   (accountant/dispatch-current!)
   (mount-root))
 
+(GET "/reset") ;; DEV
 (defonce is-router-started? (server-comms/start-router!))
-
-
-;;; -------------------------
-;;; Signaling and data management
-
-(defn onsignalingstatechange! [state]
-    (.debug js/console "Signaling state change: %s" state))
-
-(defn oniceconnectionstatechange! [state]
-    (.debug js/console "Ice connection state change: %s" state))
-
-(defn onicegatheringstatechange! [state]
-    (.debug js/console "Ice gathering state change: %s" state))
-
-;; Set up webrtc
-(webrtc/create-data-connection! )
+(webrtc/initialize!)
