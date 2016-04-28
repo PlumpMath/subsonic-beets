@@ -109,4 +109,23 @@
 (defn start-router! []
   (stop-router!)
   (reset! router
-          (sente/start-chsk-router! receive-channel message-handler)))
+          (sente/start-client-chsk-router! receive-channel message-handler)))
+
+
+
+;;; -------------------------
+;;; Messages to the server
+
+(defn anonymous-login "Tell the server about an anonymous user" [username]
+  (channel-send! [:webrtclient/anonymous-login {:username username}])
+  (.info js/console "Sending anonymous login for " username))
+
+(defn login "Login to the server." [username password]
+  (channel-send! [:webrtclient/login {:username username :password password}]))
+
+(defn register "Permanently register your username with a password"
+  [username password email]
+  (channel-send! [:webrtclient/register
+                  {:username username :password password :email email}]))
+
+(anonymous-login "bertil")
