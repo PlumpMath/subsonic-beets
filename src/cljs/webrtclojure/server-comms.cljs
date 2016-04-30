@@ -20,23 +20,27 @@
 (def handle-broadcast   nil)
 (def handle-offer       nil)
 (def handle-answer      nil)
+(def handle-candidate   nil)
 
 (defn set-message-handlers! 
   "Sets messages handlers:
   :broadcast  ; Broadcast message handler
   :offer      ; Offer message handler"
-  [& {:keys [broadcast offer answer]
+  [& {:keys [broadcast offer answer candidate]
       :as   opts
       :or   {broadcast       nil
              offer           nil
-             answer          nil}}] 
+             answer          nil
+             candidate       nil}}] 
   {:pre  [(not (nil? broadcast))
           (not (nil? offer))
-          (not (nil? answer))]}
+          (not (nil? answer))
+          (not (nil? candidate))]}
   
   (set! handle-broadcast broadcast)
   (set! handle-offer offer)
-  (set! handle-answer answer))
+  (set! handle-answer answer)
+  (set! handle-candidate candidate))
 
 ;;; -------------------------
 ;;; Routes
@@ -83,7 +87,7 @@
   ;; Or move it to sever to not send to sender.
 
   ;; Parse the SDP object
-  (def offer-sdp (.parse js/JSON (get-in (:event ev-msg) [1 :sdp])))
+  (def offer-sdp (.parse js/JSON (get-in (:event ev-msg) [1 :offer])))
   
   ;; Process the offer
   (handle-offer offer-sdp))
@@ -94,10 +98,21 @@
   ;; Or move it to sever to not send to sender.
 
   ;; Parse the SDP object
-  (def answer-sdp (.parse js/JSON (get-in (:event ev-msg) [1 :sdp])))
+  (def answer-sdp (.parse js/JSON (get-in (:event ev-msg) [1 :answer])))
   
   ;; Process the answer
   (handle-answer answer-sdp))
+
+(defmethod -message-handler :webrtclojure/candidate
+  [{:as ev-msg :keys [?data]}]
+  ;; Verify that we are not singaling our self
+  ;; Or move it to sever to not send to sender.
+
+  ;; Parse the SDP object
+  (def candidate (.parse js/JSON (get-in (:event ev-msg) [1 :candidate])))
+  
+  ;; Process the answer
+  (handle-candidate candidate))
 
 
 ;;; -------------------------

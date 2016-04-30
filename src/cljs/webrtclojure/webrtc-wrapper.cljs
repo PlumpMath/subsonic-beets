@@ -30,6 +30,47 @@
        	 
 	(new js/webkitRTCPeerConnection configuration))
 
+(defn set-peer-connection-callback! 
+	"Set RTCPeerConnection callback functions:
+	:pc 				; Peer connection
+	:onicecandidate 	; A callback funtion will be called on ice event
+	:ondatachannel 		; A callback funtion will be called on data channel event
+	@returns none"
+	[& { :keys [pc onicecandidate ondatachannel ]
+       	 :as   opts
+       	 :or   {pc 				nil
+       	 		onicecandidate  nil
+       	 		ondatachannel   nil }}]
+    {:pre  [(not (nil? pc))]}
+
+    (aset pc "onicecandidate"	onicecandidate)
+    (aset pc "ondatachannel"	ondatachannel))
+
+(defn create-ice-candidate! 
+	"Creates a RTCPeerConnection:
+	:candidate 	; Candidate event
+	@returns newly created RTCIceCandidate"
+	[& { :keys [candidate]
+       	 :as   opts
+       	 :or   {candidate 	nil}}]
+    {:pre  [(not (nil? candidate))]}
+       	 
+	(new js/RTCIceCandidate candidate))
+
+(defn add-peer-ice-candidate! 
+	"Creates a RTCPeerConnection:
+	:pc 				; Peer connection
+	:candidate 			; An ice candidate object
+	@returns none"
+	[& { :keys [pc candidate]
+       	 :as   opts
+       	 :or   {pc 				nil
+       	 		candidate  		nil}}]
+    {:pre  [(not (nil? pc))
+    	 	(not (nil? candidate))]}
+
+    (aset pc "addIceCandidate"	candidate))
+
 (defn create-offer! 
 	"Initiates the creation of an SDP offer:
 	:pc 				; Peer connection
@@ -50,6 +91,7 @@
 	(.createOffer pc success-callback 
  					 failure-callback 
  					 options))
+
 (defn create-answer! 
 	"Creates an answer to an offer received from a remote peer during the offer/answer 
 	negotiation of a WebRTC connection:
@@ -72,7 +114,6 @@
  					 failure-callback 
  					 options))
 
-
 (defn create-data-channel! 
 	"Creates a new data channel on the peer connection:
 	:pc 			; Peer connection
@@ -87,6 +128,29 @@
 	{:pre  [(not (nil? pc))]}
 	
 	(.createDataChannel pc label configuration))
+
+(defn set-data-channel-callback! 
+	"Set RTCDataChannel callback functions:
+	:dc 				; Data channel
+	:onmessage 			; A callback funtion will be called on message arrival
+	:onopen 			; A callback funtion will be called on open
+	:onclose 			; A callback funtion will be called on close
+	:onerror 			; A callback funtion will be called on error
+	@returns none"
+	[& { :keys [dc onmessage onopen onclose onerror]
+       	 :as   opts
+       	 :or   {dc  		nil
+       	 		onmessage  	nil
+       	 		onopen   	nil
+       	 		onclose   	nil
+       	 		onerror   	nil }}]
+    {:pre  [(not (nil? dc))]}
+
+    (aset dc "onmessage"	onmessage)
+    (aset dc "onopen"		onopen)
+    (aset dc "onclose"		onclose)
+    (aset dc "onerror"		onerror))
+
 
 (defn create-session-description! 
 	"Creates a new session description:

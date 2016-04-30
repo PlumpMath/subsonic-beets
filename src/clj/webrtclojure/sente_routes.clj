@@ -53,6 +53,12 @@
       (if (not= uid (:uid ev-msg))
         (channel-send! uid [:webrtclojure/answer (get-in (:event ev-msg)[1])] 8000))))
 
+(defmethod -message-handler :webrtclojure/candidate
+  [{:as ev-msg :keys [?data]}]
+  (println "Server received a candidate: %s" :event)
+  (doseq [uid (:any @connected-uids)]
+      (if (not= uid (:uid ev-msg))
+        (channel-send! uid [:webrtclojure/candidate (get-in (:event ev-msg)[1])] 8000))))
 
 ;;; -------------------------
 ;;; Router lifecycle.
