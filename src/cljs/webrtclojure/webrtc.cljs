@@ -74,7 +74,7 @@
 	;; Signal
 	;; TODO: Find a more suitable solution for stringify
 	(.debug js/console "# Signaling offer...")
-	(server-comms/channel-send! [:webrtclojure/signal
+	(server-comms/channel-send! [:webrtclojure/offer
 	                            {:sdp (.stringify js/JSON sdp)}]
 	                            8000))  ;; timeout
 
@@ -98,9 +98,9 @@
 (defn initialize! []
 	;; Initialize local peer and trigger signaling 
 	(set! self-pc (webrtc-wrapper/create-peer-connection!))
-	(server-comms/set-message-handlers! :broadcast broadcast-process! 
-										:offer offer-process!
-										:answer answer-process!) 
+	(server-comms/set-message-handlers! :broadcast  broadcast-process!
+										:offer 		offer-process!
+										:answer 	answer-process!)
 	(webrtc-wrapper/create-offer! :pc               self-pc
 	                      :success-callback offer-success!
 	                      :failure-callback offer-failure! ))
