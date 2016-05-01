@@ -106,6 +106,8 @@
 								   :failure-callback answer-failure!)
 
 	;; Store the peer connection
+	;; TODO: This will be used later, we will also need to 
+	;; 		 store uuid of the users, for singaling.
 	;;(set! conncted-peers (conj conncted-peers {pc dc}))
 	)
 
