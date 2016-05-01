@@ -9,18 +9,19 @@
 
 
 (defroutes routes
+  ;; Web pages
   (GET  "/" [] loading-page)
   (GET  "/about" [] loading-page)
+  (GET  "/register" [] loading-page)
+  ;; Sente
   (GET  "/sente" req (sente-routes/ring-ajax-get-or-ws-handshake req))
   (POST "/sente" req (sente-routes/ring-ajax-post                req))
-
   (GET  "/broadcast" []
         (broadcast! 9001 sente-routes/connected-uids)
         (broadcast! 9001 :sente/all-users-without-uid))
-
   (GET  "/reset-sente-router" []
         sente-routes/start-router!)
-
+  ;; Static content
   (resources "/")
   (not-found "Not Found"))
 

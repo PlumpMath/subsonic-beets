@@ -12,38 +12,39 @@
 ;;; -------------------------
 ;;; Views
 
-(defn username []
-  [:div [:h3 "Enter nickname:"]])
-
-(defn username-section [value]
+(defn atom-field [value placeholder]
 [:input {:type "text"
          :value @value
+         :placeholder placeholder
          :on-change #(reset! value (-> % .-target .-value))}])
 
-(defonce name-atom (reagent/atom "Abu"))
-
-(defn shared-state []
-    (fn []
-      [:div
-       [:h5 "What do you want ? "]
-       [username-section name-atom]
-       [:input {:type "button" :value "Start!" :on-click
-                #(server-comms/anonymous-login "Bengt")}]
-       [:p "We will call you " @name-atom "!"]]))
-
-(defn what-is [what]
-  [:h1 "WHAT IS " what "?"])
+(defonce name-atom (atom ""))
+(defonce email-atom (atom ""))
+(defonce password-atom (atom ""))
 
 (defn home-page []
   [:div [:h2 "Welcome to this page!"]
-   [:div [:a {:href "/about"} "go to about page"]]
-   [shared-state]])
+   [:div [:a {:href "/about"} "About"]]
+   [:div [:a {:href "/register"} "Register"]]
+   [atom-field name-atom "Username"]
+   [:input {:type "button" :value "Start" :on-click
+            #(server-comms/anonymous-login @name-atom)}]])
 
 (defn about-page []
   (server-comms/channel-send! [::about])
   [:div [:h2 "About webrtclojure"]
-   [:div [:a {:href "/"} "go to the home page"]]
-   [what-is "THIS!"]])
+   [:div [:a {:href "/"} "Go to the home page"]]])
+
+(defn registry-page []
+  [:div [:h2 "Welcome to this page!"]
+   [:h5 "What you want to be called:"]
+   [atom-field name-atom "Username"]
+   [:h5 "How you want to be reached:"]
+   [atom-field email-atom "Email"]
+   [:h5 "Your secret passphrase:"]
+   [atom-field password-atom "Password"]
+   [:input {:type "button" :value "Register" :on-click
+            #(server-comms/register @name-atom @email-atom @password-atom)}]])
 
 (defn current-page []
   [:div [(session/get :current-page)]])
@@ -56,6 +57,9 @@
 
 (secretary/defroute "/about" []
   (session/put! :current-page #'about-page))
+
+(secretary/defroute "/register" []
+  (session/put! :current-page #'registry-page))
 
 ;;; -------------------------
 ;;; Initialize app
@@ -90,6 +94,6 @@
     (.debug js/console "Ice gathering state change: %s" state))
 
 ;; Set up webrtc
-(webrtc/create-data-connection!)
+;(webrtc/create-data-connection!)
 
 (GET "/restart-sente-router")

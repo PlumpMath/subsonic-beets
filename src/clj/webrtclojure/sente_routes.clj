@@ -28,22 +28,42 @@
   [{:as ev-msg :keys [id ?data event]}]
   (-message-handler ev-msg))
 
-(defmethod -message-handler :default ; Unhandled message.
+;; Unhandled message.
+(defmethod -message-handler :default
   [{:as ev-msg :keys [event]}]
   (println "Unhandled event: %s" event))
 
+;; Triggers when a particular user connects and wasn't previously connected .
+(defmethod -message-handler :chsk/uidport-open
+  [{:keys [uid client-id]}]
+  (println "New user:" uid client-id))
+
+;; Ping from clients. Who sends this and why?
+(defmethod -message-handler :chsk/ws-ping [something]
+  (println "We got a ws-ping"))
+
 
 ;;; Application specific routes
-(defmethod -message-handler :chsk/ws-ping [something] ; Ping from clients
-  (println "We got a ws-ping")
-  )
-
-
 (defmethod -message-handler :webrtclojure/signal
   [{:as ev-msg :keys [?data]}]
   (println "Server received a :webrtclojure/signal: %s" :ev-msg)
   (println ev-msg)
   (channel-send! :ev-msg connected-uids channel-send!))
+
+(defmethod -message-handler :webrtclient/anonymous-login
+  [{:keys [?data]}]
+  (println ?data)
+  (println "STUB: Hook up anonymous-login to a database."))
+
+(defmethod -message-handler :webrtclient/login
+  [{:keys [?data]}]
+  (println ?data)
+  (println "STUB: Hook up login to a database."))
+
+(defmethod -message-handler :webrtclient/register
+  [{:keys [?data]}]
+  (println ?data)
+  (println "STUB: Hook up register to a database."))
 
 
 ;;; -------------------------

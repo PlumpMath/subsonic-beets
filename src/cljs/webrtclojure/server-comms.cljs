@@ -77,8 +77,8 @@
   (channel-send! [:webrtclient/login {:username username :password password}]))
 
 (defn register "Permanently register your username with a password"
-  [username password email]
+  [username email password]
   (channel-send! [:webrtclient/register
                   {:username username :password password :email email}]))
 
-(anonymous-login "bertil")
+(GET "/reset-sente-router")
