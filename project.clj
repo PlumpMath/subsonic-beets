@@ -109,8 +109,10 @@
                    :env {:dev true}
 
                    :cljsbuild {:builds {:app {:source-paths ["env/dev/cljs"]
-                                              :compiler {:main "webrtclojure.dev"
-                                                         :source-map true}}
+                                              :compiler
+                                              {:main "webrtclojure.dev"
+                                               :optimizations :none
+                                               :source-map true}}
 
 
 

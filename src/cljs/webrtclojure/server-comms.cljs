@@ -13,8 +13,34 @@
   (def receive-channel ch-recv) ; ChannelSocket's receive channel.
   (def channel-send!   send-fn) ; ChannelSocket's send API fn.
   (def channel-state   state)   ; Watchable, read-only atom.
-  )
+)
 
+;;; -------------------------
+;;; Message handers for application routes
+(def handle-broadcast   nil)
+(def handle-offer       nil)
+(def handle-answer      nil)
+(def handle-candidate   nil)
+
+(defn set-message-handlers! 
+  "Sets messages handlers:
+  :broadcast  ; Broadcast message handler
+  :offer      ; Offer message handler"
+  [& {:keys [broadcast offer answer candidate]
+      :as   opts
+      :or   {broadcast       nil
+             offer           nil
+             answer          nil
+             candidate       nil}}] 
+  {:pre  [(not (nil? broadcast))
+          (not (nil? offer))
+          (not (nil? answer))
+          (not (nil? candidate))]}
+  
+  (set! handle-broadcast broadcast)
+  (set! handle-offer offer)
+  (set! handle-answer answer)
+  (set! handle-candidate candidate))
 
 ;;; -------------------------
 ;;; Routes
@@ -45,12 +71,48 @@
   (let [[?uid] ?data]
     (.debug js/console "Handshake done for: %s" ?uid)))
 
-
 ;;; Application specific routes
 
 (defmethod -message-handler :webrtclojure/broadcast
   [{:as ev-msg :keys [?data]}]
-  (.debug js/console "We received a broadcast" ev-msg))
+  ;; Parse the SDP object
+  (def data (.parse js/JSON (get-in (:event ev-msg) [1])))
+  
+  ;; Process the broadcast
+  (handle-offer data))
+
+(defmethod -message-handler :webrtclojure/offer
+  [{:as ev-msg :keys [?data]}]
+  ;; Verify that we are not singaling our self
+  ;; Or move it to sever to not send to sender.
+
+  ;; Parse the SDP object
+  (def offer-sdp (.parse js/JSON (get-in (:event ev-msg) [1 :offer])))
+  
+  ;; Process the offer
+  (handle-offer offer-sdp))
+
+(defmethod -message-handler :webrtclojure/answer
+  [{:as ev-msg :keys [?data]}]
+  ;; Verify that we are not singaling our self
+  ;; Or move it to sever to not send to sender.
+
+  ;; Parse the SDP object
+  (def answer-sdp (.parse js/JSON (get-in (:event ev-msg) [1 :answer])))
+  
+  ;; Process the answer
+  (handle-answer answer-sdp))
+
+(defmethod -message-handler :webrtclojure/candidate
+  [{:as ev-msg :keys [?data]}]
+  ;; Verify that we are not singaling our self
+  ;; Or move it to sever to not send to sender.
+
+  ;; Parse the SDP object
+  (def candidate (.parse js/JSON (get-in (:event ev-msg) [1 :candidate])))
+  
+  ;; Process the answer
+  (handle-candidate candidate))
 
 
 ;;; -------------------------
@@ -62,4 +124,23 @@
 (defn start-router! []
   (stop-router!)
   (reset! router
-          (sente/start-chsk-router! receive-channel message-handler)))
+          (sente/start-client-chsk-router! receive-channel message-handler)))
+
+
+
+;;; -------------------------
+;;; Messages to the server
+
+(defn anonymous-login "Tell the server about an anonymous user" [username]
+  (channel-send! [:webrtclient/anonymous-login {:username username}])
+  (.info js/console "Sending anonymous login for " username))
+
+(defn login "Login to the server." [username password]
+  (channel-send! [:webrtclient/login {:username username :password password}]))
+
+(defn register "Permanently register your username with a password"
+  [username password email]
+  (channel-send! [:webrtclient/register
+                  {:username username :password password :email email}]))
+
+(anonymous-login "bertil")
