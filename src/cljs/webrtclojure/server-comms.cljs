@@ -80,5 +80,3 @@
   [username email password]
   (channel-send! [:webrtclient/register
                   {:username username :password password :email email}]))
-
-(GET "/reset-sente-router")

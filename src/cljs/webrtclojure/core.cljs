@@ -95,5 +95,3 @@
 
 ;; Set up webrtc
 ;(webrtc/create-data-connection!)
-
-(GET "/restart-sente-router")
