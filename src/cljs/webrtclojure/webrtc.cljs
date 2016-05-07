@@ -25,16 +25,6 @@
 (defn dc-on-message! [message] 
 	 (.debug js/console "## Recived message on data channel: " (aget message "data")))
 
-(defn dc-on-open! []
-	 (.debug js/console "## Data channel opened"))
-
-(defn dc-on-close! []
-	 (.debug js/console "## Data channel closeed"))
-
-(defn dc-on-error! []
-	 (.debug js/console "## Data channel error"))
-
-
 ;;; -------------------------
 ;;; Connection peer handlers
 (defn process-candidate! 
@@ -62,7 +52,6 @@
 								  			   :onopen 		(log-message "Data channel opened.")
 								  			   :onclose 	(log-message "Data channel closed.")
 								  			   :onerror 	log-error))
-
 ;;; -------------------------
 ;;; Answer handlers
 (defn process-answer! 
