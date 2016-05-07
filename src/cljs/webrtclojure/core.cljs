@@ -79,6 +79,3 @@
   (mount-root))
 
 (defonce is-router-started? (server-comms/start-router!))
-
-;; Trigger WebRTC/Singaling
-(webrtc/initialize!)

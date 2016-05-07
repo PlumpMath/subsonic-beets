@@ -60,16 +60,22 @@
 (defn add-peer-ice-candidate! 
 	"Creates a RTCPeerConnection:
 	:pc 				; Peer connection
+	:success-callback 	; A callback funtion, will be called on success
+	:failure-callback 	; A callback funtion, will be called on failure
 	:candidate 			; An ice candidate object
 	@returns none"
-	[& { :keys [pc candidate]
+	[& { :keys [pc candidate success-callback failure-callback]
        	 :as   opts
        	 :or   {pc 				nil
-       	 		candidate  		nil}}]
+       	 		candidate  		nil
+       	 		success-callback	nil
+       	 		failure-callback	nil}}]
     {:pre  [(not (nil? pc))
     	 	(not (nil? candidate))]}
 
-    (aset pc "addIceCandidate"	candidate))
+    (.addIceCandidate pc candidate 
+    	  				 success-callback 
+    					 failure-callback))
 
 (defn create-offer! 
 	"Initiates the creation of an SDP offer:
@@ -110,7 +116,7 @@
 	{:pre  [(not (nil? pc))
 			(not (nil? success-callback))]}
 	
-	(.createOffer pc success-callback 
+	(.createAnswer pc success-callback 
  					 failure-callback 
  					 options))
 
@@ -161,6 +167,25 @@
        	 :or   {offer 	nil}}]
 	(new js/RTCSessionDescription offer))
 
+(defn set-local-description! 
+	"Set local description associated with the connection:
+	:pc 					; Peer connection
+	:session-description	; Session description
+	:success-callback 		; A callback funtion, will be called on success.
+	:failure-callback 		; A callback funtion, will be called on failure.
+	@returns A Promise object which is fulfilled when the local description is changed or failed."
+	[& { :keys [pc session-description success-callback failure-callback]
+		 :as   opts
+       	 :or   {pc 					nil
+       	 		session-description nil
+       	 		success-callback	nil
+       	 		failure-callback	nil}}] 
+	{:pre  [(not (nil? pc))
+			(not (nil? session-description))]}
+	
+	(.setLocalDescription pc  session-description 
+							  success-callback
+							  failure-callback))
 
 (defn set-remote-description! 
 	"Set remote description associated with the connection:
