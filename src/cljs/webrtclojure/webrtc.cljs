@@ -5,19 +5,17 @@
 ;;; WebRTC connection handler
 
 ;; Global
-(def ^:dynamic self-pc nil) 			;; Our local peer connection
-(def ^:dynamic self-dc nil) 			;; Our local data channel
-(def ^:dynamic conncted-peers []) 		;; Connected peers
+(def ^:dynamic conncted-peers {}) 		;; Connected peers
 
 ;;; -------------------------
 ;;; Logger
-(defn log-error 
-	"Error logger"
+(defn log-message 
+	"Error message"
 	[message]
-	(.debug js/console message))
+	(.debug js/console (str "# " message)))
 
-(defn log-message [message] 
-	 (fn []  (log-error (str "# " message))))
+(defn log-message-fn [message] 
+	 (fn [] (log-message message)))
 
 ;;; -------------------------
 ;;; Data channel handlers
@@ -32,10 +30,10 @@
 	[send-fn sender candidate]
 	(.debug js/console "# Recived an candidate, processing.")
 
-	(webrtc-wrapper/add-peer-ice-candidate! :pc self-pc 
-	:candidate (webrtc-wrapper/create-ice-candidate! :candidate candidate) 
-	:success-callback (log-message "Candidate successfully added.")
-	:failure-callback log-error))
+	(webrtc-wrapper/add-peer-ice-candidate! :pc (:sender conncted-peers) 
+											:candidate (webrtc-wrapper/create-ice-candidate! :candidate candidate) 
+											:success-callback (log-message-fn "Candidate successfully added.")
+											:failure-callback log-message-fn))
 
 (defn pc-on-ice-candidate-fn 
 	[send-fn sender pc] 
@@ -49,22 +47,22 @@
 (defn pc-on-data-channel! [event] 
 	(webrtc-wrapper/set-data-channel-callback! :dc 			(aget event "channel")
 								  			   :onmessage  	dc-on-message!
-								  			   :onopen 		(log-message "Data channel opened.")
-								  			   :onclose 	(log-message "Data channel closed.")
-								  			   :onerror 	log-error))
+								  			   :onopen 		(log-message-fn "Data channel opened.")
+								  			   :onclose 	(log-message-fn "Data channel closed.")
+								  			   :onerror 	log-message-fn))
 ;;; -------------------------
 ;;; Answer handlers
 (defn process-answer! 
 	"Process recived answers"
 	[send-fn sender answer]
 	(log-message "Recived an answer, processing.")
-	(def answer-session (webrtc-wrapper/create-session-description! answer)) 
-	(aset answer-session "type" (.-type answer))
-	(aset answer-session "sdp"  (.-sdp answer))
-	(webrtc-wrapper/set-remote-description! :pc self-pc
-											:session-description answer-session
-											:success-callback (log-message "Successfully added local description.")
-											:failure-callback log-error))
+	(let [session (webrtc-wrapper/create-session-description! nil)]  
+		(aset session "type" (.-type answer))
+		(aset session "sdp"  (.-sdp answer))
+		(webrtc-wrapper/set-remote-description! :pc (:sender conncted-peers)
+												:session-description session
+												:success-callback (log-message-fn "Successfully added local description.")
+												:failure-callback log-message-fn)))
 
 (defn answer-success-fn
 	"Callback function for newly requested answer"
@@ -73,8 +71,8 @@
 		(log-message "Answering offer.")
 		(webrtc-wrapper/set-local-description! :pc 	pc 
 											   :session-description answer
-											   :success-callback (log-message "Successfully added local description.")
-											   :failure-callback log-error)
+											   :success-callback (log-message-fn "Successfully added local description.")
+											   :failure-callback log-message-fn)
 		(send-fn [:webrtclojure/answer  { :receiver	sender
 	              						  :answer 	(.stringify js/JSON answer)}] 8000)))
 
@@ -88,8 +86,8 @@
 		(log-message "Sending requested offer.")
 		(webrtc-wrapper/set-local-description! :pc 	pc 
 											   :session-description offer
-											   :success-callback (log-message "Successfully added local description.")
-											   :failure-callback log-error)
+											   :success-callback (log-message-fn "Successfully added local description.")
+											   :failure-callback log-message-fn)
 		(send-fn [:webrtclojure/offer { :receiver	sender
 	              						:offer 	   (.stringify js/JSON offer)}] 8000)))
 
@@ -100,39 +98,33 @@
 		(log-message "New session created")
 		(webrtc-wrapper/create-answer! :pc pc
 								   	   :success-callback (answer-success-fn send-fn sender pc)
-								   	   :failure-callback log-error)))
+								   	   :failure-callback log-message-fn)))
 
 (defn process-offer! 
 	"Process newly recived offers"
 	[send-fn sender offer]
 	(log-message "Recived an offer, processing.")
 
-	(set! self-pc (webrtc-wrapper/create-peer-connection!))
-	(set! self-dc (webrtc-wrapper/create-data-channel! :pc self-pc))
-	(webrtc-wrapper/set-data-channel-callback! :dc 			self-dc
-								  			   :onmessage  	dc-on-message!
-								  			   :onopen 		(log-message "Data channel opened.")
-								  			   :onclose 	(log-message "Data channel closed.")
-								  			   :onerror 	log-error)
+	(let [pc (webrtc-wrapper/create-peer-connection!)
+		  dc (webrtc-wrapper/create-data-channel! :pc pc)]
+		(webrtc-wrapper/set-data-channel-callback! :dc 			dc
+									  			   :onmessage  	dc-on-message!
+									  			   :onopen 		(log-message-fn "Data channel opened.")
+									  			   :onclose 	(log-message-fn "Data channel closed.")
+									  			   :onerror 	log-message-fn)
 
-	(webrtc-wrapper/set-peer-connection-callback! :pc self-pc
-								  				  :onicecandidate (pc-on-ice-candidate-fn send-fn sender self-pc)
-								  				  :ondatachannel  pc-on-data-channel!)
+		(webrtc-wrapper/set-peer-connection-callback! :pc pc
+								  				  	  :onicecandidate (pc-on-ice-candidate-fn send-fn sender pc)
+								  				  	  :ondatachannel  pc-on-data-channel!)
 	
-	(def session (webrtc-wrapper/create-session-description! nil)) 
-	(aset session "type" (.-type offer))
-	(aset session "sdp"  (.-sdp offer))
-
-	(webrtc-wrapper/set-remote-description! :pc self-pc
-											:session-description session
-											:success-callback 	 (session-success-fn send-fn sender self-pc)
-											:failure-callback 	 log-error)
-	
-	;; Store the peer connection
-	;; TODO: This will be used later, we will also need to 
-	;; 		 store uuid of the users, for singaling.
-	;;(set! conncted-peers (conj conncted-peers {pc dc}))
-	)
+		(let [session (webrtc-wrapper/create-session-description! nil)]  
+			(aset session "type" (.-type offer))
+			(aset session "sdp"  (.-sdp offer))
+			(webrtc-wrapper/set-remote-description! :pc pc
+													:session-description session
+													:success-callback 	 (session-success-fn send-fn sender pc)
+													:failure-callback 	 log-message-fn))
+		(set! conncted-peers (assoc conncted-peers :sender pc))))
 
 ;;; -------------------------
 ;;; New user handlers
@@ -141,19 +133,19 @@
 	"Process new users"
 	[send-fn sender]
 	(log-message "New user, processing.")
-	(set! self-pc (webrtc-wrapper/create-peer-connection!))
-	(set! self-dc (webrtc-wrapper/create-data-channel! :pc self-pc))
-	(webrtc-wrapper/set-data-channel-callback! :dc 			self-dc
-								  			   :onmessage  	dc-on-message!
-								  			   :onopen 		(log-message "Data channel opened.")
-								  			   :onclose 	(log-message "Data channel closed.")
-								  			   :onerror 	log-error)
+	(let [pc (webrtc-wrapper/create-peer-connection!)
+		  dc (webrtc-wrapper/create-data-channel! :pc pc)]
+		(webrtc-wrapper/set-data-channel-callback! 	:dc 			dc
+								  			   		:onmessage  	dc-on-message!
+								  			   		:onopen 		(log-message-fn "Data channel opened.")
+								  			   		:onclose 		(log-message-fn "Data channel closed.")
+								  			   		:onerror 		log-message-fn)
+		  
+		(webrtc-wrapper/set-peer-connection-callback! 	:pc pc
+									  				  	:onicecandidate (pc-on-ice-candidate-fn send-fn sender pc)
+									  				  	:ondatachannel  pc-on-data-channel!)
 
-	(webrtc-wrapper/set-peer-connection-callback! :pc self-pc
-								  				  :onicecandidate (pc-on-ice-candidate-fn send-fn sender self-pc)
-								  				  :ondatachannel  pc-on-data-channel!)
-
-
-	(webrtc-wrapper/create-offer! :pc               self-pc
-	                      		  :success-callback (offer-success-fn send-fn sender self-pc)
-	                          	  :failure-callback log-error))
+		(webrtc-wrapper/create-offer! 	:pc               pc
+	                      		  		:success-callback (offer-success-fn send-fn sender pc)
+	                          	  		:failure-callback log-message-fn)
+		(set! conncted-peers (assoc conncted-peers :sender pc))))
