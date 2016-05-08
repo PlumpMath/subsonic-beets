@@ -18,12 +18,17 @@
 
 ;;; -------------------------
 ;;; General
-(defn broadcast! 
+(defn broadcast 
   "Send a broadcast to all users except caller" 
   [func data caller]
   (doseq [uid (:any @connected-uids)]
       (if (not= uid caller)
         (channel-send! uid [func data] 8000))))
+
+(defn broadcast-new-user 
+  [user]
+  "Broadcast the newly connected user"
+  (broadcast :webrtclojure/new-user {:user user} user))
 
 ;;; -------------------------
 ;;; Routes
@@ -50,18 +55,18 @@
 (defmethod -message-handler :chsk/ws-ping [something]
   (println "We got a ws-ping"))
 
-
 ;;; Application specific authentication routes
 (defmethod -message-handler :webrtclient/anonymous-login
   [{:as ev-msg :keys [?data]}]
   (println ?data)
   (println "STUB: Hook up anonymous-login to a database.")
-  (broadcast! :webrtclojure/new-user {:user (:uid ev-msg)} (:uid ev-msg)))
+  (broadcast-new-user (:uid ev-msg)))
 
 (defmethod -message-handler :webrtclient/login
   [{:as ev-msg :keys [?data]}]
   (println ?data)
-  (println "STUB: Hook up login to a database."))
+  (println "STUB: Hook up login to a database.")
+  (broadcast-new-user (:uid ev-msg)))
 
 (defmethod -message-handler :webrtclient/register
   [{:as ev-msg :keys [?data]}]
@@ -89,8 +94,6 @@
   (channel-send!  (:receiver (get-in event[1])) 
                   [:webrtclojure/candidate  {:sender uid
                                              :candidate  (:candidate (get-in event[1]))}]))
-
-
 
 ;;; -------------------------
 ;;; Router lifecycle.
