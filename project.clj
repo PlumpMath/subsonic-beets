@@ -7,12 +7,20 @@
   :dependencies
   [[org.clojure/clojure "1.8.0"]
    [org.clojure/tools.reader "0.10.0"] ; Dependency issue between sente and ring.
+   [org.clojure/core.cache "0.6.4"]    ; Version requiered by figwheel.
+
    [ring-server "0.4.0"]               ; Library for starting a web server.
    [ring/ring-core "1.4.0"]            ; HTTP abstraction library.
    [ring/ring-defaults "0.2.0"]        ; Middleware collection.
-   [yogthos/config "0.8"]              ; Managing environment configuration.
+   [yogthos/config "0.8"]              ; Managing environment configs.
    [compojure "1.5.0"]                 ; Routing.
    [http-kit "2.1.19"]                 ; Our web server.
+   [korma "0.4.2"]                     ; SQL abstraction.
+   [org.postgresql/postgresql "9.4.1208"]
+   [ragtime "0.5.3"]                   ; Database migrations.
+   [buddy/buddy-core "0.12.1"]         ; Authorization and authentication.
+   [buddy/buddy-hashers "0.14.0"]      ; Hash functions.
+   [heroku-database-url-to-jdbc "0.2.2"];Helper function heroku<->korma.
 
    [org.clojure/clojurescript "1.8.40"
     :scope "provided"]
@@ -47,6 +55,7 @@
    [:cljsbuild :builds :app :compiler :output-to]]
 
   :source-paths ["src/clj" "src/cljc"]
+  :test-paths ["test/clj" "test/cljc"]
   :resource-paths ["resources" "target/cljsbuild"]
 
   :aliases {"migrate"  ["run" "-m" "webrtclojure.database/migrate"]

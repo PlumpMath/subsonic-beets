@@ -25,10 +25,10 @@
 (defn home-page []
   [:div [:h2 "Welcome to this page!"]
    [:div [:a {:href "/about"} "About"]]
-   [:div [:a {:href "/register"} "Register"]]
+   [:div [:a {:href "/register"} "Register your account"]]
    [atom-field name-atom "Username"]
    [:input {:type "button" :value "Start" :on-click
-            #(server-comms/anonymous-login @name-atom)}]])
+            #((GET "/restart-sente-router")(server-comms/anonymous-login @name-atom))}]])
 
 (defn about-page []
   (server-comms/channel-send! [::about])
