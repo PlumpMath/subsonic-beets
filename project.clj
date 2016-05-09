@@ -1,4 +1,4 @@
-(defproject webrtclojure "0.0.1"
+(defproject webrtclojure "0.1.0"
   :description "Real time JSON data communication between browsers."
   :url "https://github.com/Rovanion/WebRTClojure"
   :license {:name "AGPLv3"
@@ -26,6 +26,7 @@
 
    [cljs-ajax "0.5.4"]                 ; Testing purposes only.
    ]
+
   :plugins [[lein-environ "1.0.2"]
             [lein-cljsbuild "1.1.1"]
             [lein-asset-minifier "0.2.7"
@@ -47,6 +48,9 @@
 
   :source-paths ["src/clj" "src/cljc"]
   :resource-paths ["resources" "target/cljsbuild"]
+
+  :aliases {"migrate"  ["run" "-m" "webrtclojure.database/migrate"]
+            "rollback" ["run" "-m" "webrtclojure.database/rollback"]}
 
   :minify-assets
   {:assets
