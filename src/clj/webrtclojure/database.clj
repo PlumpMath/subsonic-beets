@@ -1,6 +1,6 @@
 (ns webrtclojure.database
   (:require
-   [korma.core :refer :all]
+   [korma.core :refer [defentity entity-fields table has-many]]
    [korma.db   :refer [defdb postgres default-connection]]
    [ragtime.jdbc :as jdbc]
    [ragtime.repl :as repl]
@@ -38,16 +38,19 @@
 ;;; --------------------
 ;;; Setup
 
-;; Either use environment variable or default to localhost.
-(def db-uri (java.net.URI. (or (System/getenv "DATABASE_URL")
-                               "postgresql://localhost:5432/:webrtclojure")))
+;; Either use environment variable or default to current_user@localhost/webrtclojure.
+;; You may need to trust all connections from 127.0.0.1 in /etc/postgresql/9.5/main/pg_hba.conf.
+(def db-uri
+  (java.net.URI. (or (System/getenv "DATABASE_URL")
+                     (clojure.core/format "postgresql://%s@localhost:5432/webrtclojure"
+                                          (System/getenv "USER")))))
 
 ;; Also sets this db as the default db for future korma calls.
 (defdb db (korma-connection-map-from-uri db-uri))
 
 ;; For the ragtime migrations.
 (defn- load-config []
-  {:datastore  (jdbc/sql-database db-uri)
+  {:datastore  (jdbc/sql-database (.toString db-uri))
    :migrations (jdbc/load-resources "migrations")})
 
 (defn migrate []
