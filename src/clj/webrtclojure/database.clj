@@ -67,9 +67,7 @@
 (declare users tokens)
 
 (defentity auth-tokens
-  (table :authorization_tokens)
-  (entity-fields :uid :token))
+  (table :authorization_tokens))
 
 (defentity users
-  (has-many auth-tokens)
-  (entity-fields :uid :username :email)) ; Default fields on select
+  (has-many auth-tokens)) ; Default fields on select
