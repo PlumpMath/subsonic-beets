@@ -6,7 +6,7 @@
             [buddy.core.codecs :as codecs]))
 
 (defn get-salt "Get a salt to add to your user data." []
-  (codecs/bytes->hex (nonce/random-nonce 16)))
+  (codecs/bytes->str (nonce/random-bytes 16)))
 
 (defn create "Create a user account for the given map." [user]
   (insert db/users
