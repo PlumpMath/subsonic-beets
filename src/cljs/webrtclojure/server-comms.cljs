@@ -80,8 +80,6 @@
   (reset! router
           (sente/start-client-chsk-router! receive-channel message-handler)))
 
-
-
 ;;; -------------------------
 ;;; Messages to the server
 

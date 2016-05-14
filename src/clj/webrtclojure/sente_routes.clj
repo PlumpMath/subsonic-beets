@@ -57,16 +57,16 @@
 
 ;;; Application specific authentication routes
 (defmethod -message-handler :webrtclient/anonymous-login
-  [{:as ev-msg :keys [?data]}]
+  [{:keys [uid ?data]}]
   (println ?data)
   (println "STUB: Hook up anonymous-login to a database.")
-  (broadcast-new-user (:uid ev-msg)))
+  (broadcast-new-user uid))
 
 (defmethod -message-handler :webrtclient/login
-  [{:as ev-msg :keys [?data]}]
+  [{:keys [uid ?data]}]
   (println ?data)
   (println "STUB: Hook up login to a database.")
-  (broadcast-new-user (:uid ev-msg)))
+  (broadcast-new-user uid))
 
 (defmethod -message-handler :webrtclient/register
   [{:as ev-msg :keys [?data]}]
@@ -75,21 +75,21 @@
 
 ;;; Application specific WebRTC routes
 (defmethod -message-handler :webrtclojure/offer
-  [{:as ev-msg :keys [uid event ?data]}]
+  [{:keys [uid event ?data]}]
   (println "Server received an offer, processing ")
   (channel-send!  (:receiver (get-in event[1])) 
                   [:webrtclojure/offer  {:sender uid
                                           :offer  (:offer (get-in event[1]))}]))
 
 (defmethod -message-handler :webrtclojure/answer
-  [{:as ev-msg :keys [uid event ?data]}]
+  [{:keys [uid event ?data]}]
   (println "Server received an answer, processing ")
   (channel-send!  (:receiver (get-in event[1])) 
                   [:webrtclojure/answer  {:sender uid
                                           :answer  (:answer (get-in event[1]))}]))
 
 (defmethod -message-handler :webrtclojure/candidate
-  [{:as ev-msg :keys [uid event ?data]}]
+  [{:keys [uid event ?data]}]
   (println "Server received an candidate, processing ")
   (channel-send!  (:receiver (get-in event[1])) 
                   [:webrtclojure/candidate  {:sender uid
