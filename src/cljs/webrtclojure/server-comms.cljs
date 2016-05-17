@@ -22,7 +22,7 @@
 (def handle-answer      nil)
 (def handle-candidate   nil)
 
-(defn set-message-handlers! 
+(defn set-message-handlers!
   "Sets messages handlers:
   :broadcast  ; Broadcast message handler
   :offer      ; Offer message handler"
@@ -31,12 +31,12 @@
       :or   {broadcast       nil
              offer           nil
              answer          nil
-             candidate       nil}}] 
+             candidate       nil}}]
   {:pre  [(not (nil? broadcast))
           (not (nil? offer))
           (not (nil? answer))
           (not (nil? candidate))]}
-  
+
   (set! handle-broadcast broadcast)
   (set! handle-offer offer)
   (set! handle-answer answer)
@@ -77,7 +77,7 @@
   [{:as ev-msg :keys [?data]}]
   ;; Parse the SDP object
   (def data (.parse js/JSON (get-in (:event ev-msg) [1])))
-  
+
   ;; Process the broadcast
   (handle-offer data))
 
@@ -88,7 +88,7 @@
 
   ;; Parse the SDP object
   (def offer-sdp (.parse js/JSON (get-in (:event ev-msg) [1 :offer])))
-  
+
   ;; Process the offer
   (handle-offer offer-sdp))
 
@@ -99,7 +99,7 @@
 
   ;; Parse the SDP object
   (def answer-sdp (.parse js/JSON (get-in (:event ev-msg) [1 :answer])))
-  
+
   ;; Process the answer
   (handle-answer answer-sdp))
 
@@ -110,7 +110,7 @@
 
   ;; Parse the SDP object
   (def candidate (.parse js/JSON (get-in (:event ev-msg) [1 :candidate])))
-  
+
   ;; Process the answer
   (handle-candidate candidate))
 
@@ -123,22 +123,22 @@
 (defn stop-router! [] (when-let [stop-f @router] (stop-f)))
 (defn start-router! []
   (stop-router!)
-  (reset! router
-          (sente/start-client-chsk-router! receive-channel message-handler)))
+  (reset! router (sente/start-client-chsk-router! receive-channel
+                                                  message-handler)))
 
 
 
 ;;; -------------------------
 ;;; Messages to the server
 
-(defn anonymous-login "Tell the server about an anonymous user" [username]
-  (channel-send! [:webrtclient/anonymous-login {:username username}])
-  (.info js/console "Sending anonymous login for " username))
+(defn anonymous-login "Log in as a returning anonymous user." [nickname]
+  (channel-send! [:webrtclient/anonymous-login {:nickname nickname}])
+  (.info js/console "Sending anonymous login for " nickname " with id "))
 
-(defn login "Login to the server." [username password]
-  (channel-send! [:webrtclient/login {:username username :password password}]))
+(defn login "Login to the server." [email password]
+  (channel-send! [:webrtclient/login {:email email :password password}]))
 
-(defn register "Permanently register your username with a password"
-  [username email password]
+(defn register "Permanently register your email with a password"
+  [email password]
   (channel-send! [:webrtclient/register
-                  {:username username :password password :email email}]))
+                  {:password password :email email}]))

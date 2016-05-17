@@ -1,20 +1,26 @@
 (ns webrtclojure.sente-routes
   (:require [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit
-             :refer [sente-web-server-adapter]]))
+             :refer [sente-web-server-adapter]]
+            [webrtclojure.accounts :as accounts]))
 
 ;;; -------------------------
 ;;; Setup
 
-(let [{:keys [ch-recv send-fn ajax-post-fn ajax-get-or-ws-handshake-fn connected-uids user-id-fn]}
+(let [{:keys [ch-recv send-fn ajax-post-fn
+              ajax-get-or-ws-handshake-fn
+              connected-uids user-id-fn]}
       (sente/make-channel-socket! sente-web-server-adapter
-                                  {:user-id-fn  (fn [ring-req] (str (get-in ring-req [:session :base-user-id]) "/" (:client-id ring-req))) })]
+                                  {:user-id-fn
+                                   (fn [_] (:id (accounts/create-anonymous-user)))})]
   (def ring-ajax-post                ajax-post-fn)
   (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
-  (def receive-channel               ch-recv) ; ChannelSocket's receive channel
-  (def channel-send!                 send-fn) ; ChannelSocket's send API fn
-  (def connected-uids                connected-uids) ; Watchable, read-only atom
-  )
+  ;; ChannelSocket's receive channel.
+  (def receive-channel               ch-recv)
+  ;; ChannelSocket's send API func.
+  (def channel-send!                 send-fn)
+  ; Watchable, read-only atom.
+  (def connected-uids                connected-uids))
 
 
 ;;; -------------------------
@@ -39,16 +45,15 @@
   [{:keys [uid client-id]}]
   (println "New user:" uid client-id))
 
-;; Ping from clients. Who sends this and why?
-(defmethod -message-handler :chsk/ws-ping [something]
-  (println "We got a ws-ping"))
+;; Ping from clients. Apparently to check that socket is alive.
+(defmethod -message-handler :chsk/ws-ping [_])
 
 
 ;;; Application specific authentication routes
 (defmethod -message-handler :webrtclient/anonymous-login
-  [{:keys [?data]}]
-  (println ?data)
-  (println "STUB: Hook up anonymous-login to a database."))
+  [{:keys [?data :as user]}]
+  (println "Updating account for" user)
+  (accounts/update-user user))
 
 (defmethod -message-handler :webrtclient/login
   [{:keys [?data]}]

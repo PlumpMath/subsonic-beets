@@ -28,7 +28,8 @@
    [:div [:a {:href "/register"} "Register your account"]]
    [atom-field name-atom "Username"]
    [:input {:type "button" :value "Start" :on-click
-            #((GET "/restart-sente-router")(server-comms/anonymous-login @name-atom))}]])
+            #((GET "/restart-sente-router")
+              (server-comms/anonymous-login @name-atom))}]])
 
 (defn about-page []
   (server-comms/channel-send! [::about])
@@ -37,14 +38,12 @@
 
 (defn registry-page []
   [:div [:h2 "Welcome to this page!"]
-   [:h5 "What you want to be called:"]
-   [atom-field name-atom "Username"]
    [:h5 "How you want to be reached:"]
    [atom-field email-atom "Email"]
    [:h5 "Your secret passphrase:"]
    [atom-field password-atom "Password"]
    [:input {:type "button" :value "Register" :on-click
-            #(server-comms/register @name-atom @email-atom @password-atom)}]])
+            #(server-comms/register @email-atom @password-atom)}]])
 
 (defn current-page []
   [:div [(session/get :current-page)]])
