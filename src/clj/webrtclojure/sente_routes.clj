@@ -22,6 +22,19 @@
   ; Watchable, read-only atom.
   (def connected-uids                connected-uids))
 
+;;; -------------------------
+;;; General
+(defn broadcast
+  "Send a broadcast to all users except caller"
+  [func data caller]
+  (doseq [uid (:any @connected-uids)]
+      (if (not= uid caller)
+        (channel-send! uid [func data] 8000))))
+
+(defn broadcast-new-user
+  [user]
+  "Broadcast the newly connected user"
+  (broadcast :webrtclojure/new-user {:user user} user))
 
 ;;; -------------------------
 ;;; Routes
@@ -53,42 +66,41 @@
 (defmethod -message-handler :webrtclient/anonymous-login
   [{:keys [?data :as user]}]
   (println "Updating account for" user)
-  (accounts/update-user user))
+  (accounts/update-user user)
+  (broadcast-new-user (:id user)))
 
 (defmethod -message-handler :webrtclient/login
-  [{:keys [?data]}]
+  [{:keys [uid ?data]}]
   (println ?data)
-  (println "STUB: Hook up login to a database."))
+  (println "STUB: Hook up login to a database.")
+  (broadcast-new-user uid))
 
 (defmethod -message-handler :webrtclient/register
   [{:keys [?data]}]
   (println ?data)
   (println "STUB: Hook up register to a database."))
 
-
 ;;; Application specific WebRTC routes
 (defmethod -message-handler :webrtclojure/offer
-  [{:as ev-msg :keys [?data]}]
-  (println "Server received a signal: %s" :event)
-   (doseq [uid (:any @connected-uids)]
-      (if (not= uid (:uid ev-msg))
-        (channel-send! uid [:webrtclojure/offer (get-in (:event ev-msg)[1])] 8000))))
+  [{:keys [uid event ?data]}]
+  (println "Server received an offer, processing ")
+  (channel-send!  (:receiver (get-in event[1]))
+                  [:webrtclojure/offer  {:sender uid
+                                          :offer  (:offer (get-in event[1]))}]))
 
 (defmethod -message-handler :webrtclojure/answer
-  [{:as ev-msg :keys [?data]}]
-  (println "Server received a answer: %s" :event)
-  (doseq [uid (:any @connected-uids)]
-      (if (not= uid (:uid ev-msg))
-        (channel-send! uid [:webrtclojure/answer (get-in (:event ev-msg)[1])] 8000))))
+  [{:keys [uid event ?data]}]
+  (println "Server received an answer, processing ")
+  (channel-send!  (:receiver (get-in event[1]))
+                  [:webrtclojure/answer  {:sender uid
+                                          :answer  (:answer (get-in event[1]))}]))
 
 (defmethod -message-handler :webrtclojure/candidate
-  [{:as ev-msg :keys [?data]}]
-  (println "Server received a candidate: %s" :event)
-  (doseq [uid (:any @connected-uids)]
-      (if (not= uid (:uid ev-msg))
-        (channel-send! uid [:webrtclojure/candidate (get-in (:event ev-msg)[1])] 8000))))
-
-
+  [{:keys [uid event ?data]}]
+  (println "Server received an candidate, processing ")
+  (channel-send!  (:receiver (get-in event[1]))
+                  [:webrtclojure/candidate  {:sender uid
+                                             :candidate  (:candidate (get-in event[1]))}]))
 
 ;;; -------------------------
 ;;; Router lifecycle.
