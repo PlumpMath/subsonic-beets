@@ -34,7 +34,7 @@
    [:div [:a {:href "/register"} "Register"]]
    [atom-field name-atom "Username"]
    [:input {:type "button" :value "Start" :on-click 
-            #(do (server-comms/anonymous-login @name-atom) 
+            #(do (server-comms/anonymous-login! @name-atom) 
               (secretary/dispatch! "/chat"))}]])
 
 (defn about-page []
@@ -55,12 +55,18 @@
 (defn chat-page []
   (server-comms/channel-send! [::about])
   [:div {:id :chat} [:h2 "Chat room"]
+<<<<<<< 1e5322bfb36467510b2cd718ce8e5d98685231ec
    [:div {:id :received} (atom-textarea-field :received chat/recvtextarea-atom true)]
    [:div {:id :send} (atom-textarea-field :send sendtextarea-atom false) 
             [:input {:id :send-btn :type "button" :value "Send" :on-click
               (fn [] (webrtc/dc-send-message! @sendtextarea-atom)
                 (chat/append! @name-atom @sendtextarea-atom)
                 (reset! sendtextarea-atom nil))}]]])
+=======
+   [:div {:id :received} [:textarea {:id :received :disabled true}]]
+   [:div {:id :send} [:textarea {:id :send}] [:input {:id :send-btn :type "button" :value "Send" :on-click
+            #(webrtc/dc-send-message! @name-atom)}]]])
+>>>>>>> Added chat-page
 
 (defn current-page []
   [:div [(session/get :current-page)]])
