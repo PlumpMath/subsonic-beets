@@ -40,3 +40,47 @@ a:hover {
 input {
 	width: 20em;
 }
+
+textarea {
+    color: #444;
+    font-size: 0.9em;
+    height: calc(100% - 10px);
+    width: calc(100%);
+    padding:0;
+}
+
+div#chat { 
+    height: 500px;
+}
+div#received {
+    height: calc(80%);
+}
+
+div#send {
+    height: calc(20%);
+    display: inline-block;
+    width: calc(100%);   
+}
+
+#send-btn {
+	background-color: #3498db;
+    border: none;
+    color: white;
+    font-size: 0.8em;
+    padding: 0.5em 0.7em 0.6em 0.7em;
+    width: calc(30%);
+    height: calc(100% - 10px);
+    float:right;
+}
+
+#send-btn:hover {
+    background-color: #3cb0fd;
+}
+
+textarea#received {
+	overflow: hidden;
+}
+
+textarea#send {
+    width: calc(70% - 5px);
+}
