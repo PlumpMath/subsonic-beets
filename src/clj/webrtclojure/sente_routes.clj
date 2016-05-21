@@ -64,9 +64,9 @@
 
 ;;; Application specific authentication routes
 (defmethod -message-handler :webrtclient/anonymous-login
-  [{:keys [?data :as user]}]
+  [{:keys [uid user ?data]}]
   (println "Updating account for" user)
-  (accounts/update-user! user)
+  (accounts/update-user! uid user)
   (broadcast-new-user (:id user)))
 
 (defmethod -message-handler :webrtclient/login
