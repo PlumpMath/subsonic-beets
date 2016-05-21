@@ -120,7 +120,6 @@
 (defn anonymous-login! "Log in as a returning anonymous user." [nickname]
   (channel-send! [:webrtclient/anonymous-login {:nickname nickname}])
   (.info js/console "Sending anonymous login for" nickname "with id "))
-(anonymous-login! "hi")
 
 (defn login! "Login to the server." [email password]
   (channel-send! [:webrtclient/login {:email email :password password}]))
