@@ -27,10 +27,9 @@
    [:div [:a {:href "/about"} "About"]]
    [:div [:a {:href "/register"} "Register"]]
    [atom-field name-atom "Username"]
-   [:input {:type "button" :value "Start" :on-click
-            #(server-comms/anonymous-login! @name-atom)}]
-   [:input {:type "button" :value "Send" :on-click
-            #(webrtc/dc-send-message! @name-atom)}]])
+   [:input {:type "button" :value "Start" :on-click 
+            #(do (server-comms/anonymous-login @name-atom) 
+              (secretary/dispatch! "/chat"))}]])
 
 (defn about-page []
   (server-comms/channel-send! [::about])
@@ -47,6 +46,13 @@
    [:input {:type "button" :value "Register" :on-click
             #(server-comms/register! @email-atom @password-atom)}]])
 
+(defn chat-page []
+  (server-comms/channel-send! [::about])
+  [:div {:id :chat} [:h2 "Chat room"]
+   [:div {:id :received} [:textarea {:id :received :disabled true}]]
+   [:div {:id :send} [:textarea {:id :send}] [:input {:id :send-btn :type "button" :value "Send" :on-click
+            #(webrtc/dc-send-message! @name-atom)}]]])
+
 (defn current-page []
   [:div [(session/get :current-page)]])
 
@@ -61,6 +67,9 @@
 
 (secretary/defroute "/register" []
   (session/put! :current-page #'registry-page))
+
+(secretary/defroute "/chat" []
+  (session/put! :current-page #'chat-page))
 
 ;;; -------------------------
 ;;; Initialize app
