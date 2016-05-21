@@ -47,6 +47,7 @@ textarea {
     height: calc(100% - 10px);
     width: calc(100%);
     padding:0;
+	background-color: #fff;
 }
 
 div#chat { 

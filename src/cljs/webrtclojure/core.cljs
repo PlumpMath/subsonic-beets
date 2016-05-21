@@ -28,7 +28,7 @@
    [:div [:a {:href "/register"} "Register"]]
    [atom-field name-atom "Username"]
    [:input {:type "button" :value "Start" :on-click 
-            #(when (server-comms/anonymous-login @name-atom) 
+            (fn [] (server-comms/anonymous-login @name-atom) 
               (secretary/dispatch! "/chat"))}]])
 
 (defn about-page []
