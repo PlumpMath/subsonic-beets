@@ -59,3 +59,7 @@ pom.xml.asc
 /.repl
 *.log
 /.env
+
+
+### Resources ###
+*.min.css

@@ -1,4 +1,4 @@
-(defproject webrtclojure "0.0.1"
+(defproject webrtclojure "0.1.0"
   :description "Real time JSON data communication between browsers."
   :url "https://github.com/Rovanion/WebRTClojure"
   :license {:name "AGPLv3"
@@ -7,14 +7,22 @@
   :dependencies
   [[org.clojure/clojure "1.8.0"]
    [org.clojure/tools.reader "0.10.0"] ; Dependency issue between sente and ring.
+   [org.clojure/core.cache "0.6.4"]    ; Version requiered by figwheel.
+
    [ring-server "0.4.0"]               ; Library for starting a web server.
    [ring/ring-core "1.4.0"]            ; HTTP abstraction library.
    [ring/ring-defaults "0.2.0"]        ; Middleware collection.
-   [yogthos/config "0.8"]              ; Managing environment configuration.
+   [yogthos/config "0.8"]              ; Managing environment configs.
    [compojure "1.5.0"]                 ; Routing.
    [http-kit "2.1.19"]                 ; Our web server.
+   [korma "0.4.2"]                     ; SQL abstraction.
+   [org.postgresql/postgresql "9.4.1208"]
+   [ragtime "0.5.3"]                   ; Database migrations.
+   [buddy/buddy-core "0.12.1"]         ; Authorization and authentication.
+   [buddy/buddy-hashers "0.14.0"]      ; Hash functions.
+   [heroku-database-url-to-jdbc "0.2.2"];Helper function heroku<->korma.
 
-   [org.clojure/clojurescript "1.8.40"
+   [org.clojure/clojurescript "1.8.51"
     :scope "provided"]
    [reagent "0.5.1"                    ; React abstraction.
     :exclusions [org.clojure/tools.reader]]
@@ -26,6 +34,7 @@
 
    [cljs-ajax "0.5.4"]                 ; Testing purposes only.
    ]
+
   :plugins [[lein-environ "1.0.2"]
             [lein-cljsbuild "1.1.1"]
             [lein-asset-minifier "0.2.7"
@@ -46,7 +55,11 @@
    [:cljsbuild :builds :app :compiler :output-to]]
 
   :source-paths ["src/clj" "src/cljc"]
+  :test-paths ["test/clj" "test/cljc"]
   :resource-paths ["resources" "target/cljsbuild"]
+
+  :aliases {"migrate"  ["run" "-m" "webrtclojure.database/migrate"]
+            "rollback" ["run" "-m" "webrtclojure.database/rollback"]}
 
   :minify-assets
   {:assets
@@ -78,7 +91,7 @@
                                                 org.clojure/tools.analyzer.jvm]]
                                   [org.clojure/tools.nrepl "0.2.12"]
                                   [com.cemerick/piggieback "0.2.1"]
-                                  ;[figwheel-sidecar "0.5.0-2"]
+                                  [figwheel-sidecar "0.5.3-1"]
                                   [pjstadig/humane-test-output "0.8.0"]
                                   ]
 
