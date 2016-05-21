@@ -4,7 +4,8 @@
    [korma.db   :refer [defdb postgres default-connection]]
    [ragtime.jdbc :as jdbc]
    [ragtime.repl :as repl]
-   [heroku-database-url-to-jdbc.core :as htj]))
+   [heroku-database-url-to-jdbc.core :as htj])
+  (import org.postgresql.util.PSQLException))
 
 
 ;;; --------------------
@@ -53,13 +54,6 @@
   {:datastore  (jdbc/sql-database (.toString db-uri))
    :migrations (jdbc/load-resources "migrations")})
 
-(defn migrate []
-  (repl/migrate (load-config)))
-
-(defn rollback []
-  (repl/rollback (load-config)))
-
-
 
 ;;; --------------------
 ;;; Data types
@@ -71,3 +65,20 @@
 
 (defentity users
   (has-many auth-tokens)) ; Default fields on select
+
+
+;;; --------------------
+;;; Public functions
+
+(defn migrate []
+  (repl/migrate (load-config)))
+
+(defn rollback []
+  (repl/rollback (load-config)))
+
+(defn safely "Wrap db-functions in a try-catch." [f]
+  (try (f)
+       (catch PSQLException e
+         ((println (.getMessage e))
+          ({:status 500
+            :body   (str "Caught:" (.getMessage e))})))))

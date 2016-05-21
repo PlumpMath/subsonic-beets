@@ -18,8 +18,8 @@
          :placeholder placeholder
          :on-change #(reset! value (-> % .-target .-value))}])
 
-(defonce name-atom (atom ""))
-(defonce email-atom (atom ""))
+(defonce name-atom     (atom ""))
+(defonce email-atom    (atom ""))
 (defonce password-atom (atom ""))
 
 (defn home-page []
@@ -28,8 +28,7 @@
    [:div [:a {:href "/register"} "Register"]]
    [atom-field name-atom "Username"]
    [:input {:type "button" :value "Start" :on-click
-            #((GET "/restart-sente-router")
-              (server-comms/anonymous-login @name-atom))}]
+            #(server-comms/anonymous-login! @name-atom)}]
    [:input {:type "button" :value "Send" :on-click
             #(webrtc/dc-send-message! @name-atom)}]])
 
@@ -45,7 +44,7 @@
    [:h5 "Your secret passphrase:"]
    [atom-field password-atom "Password"]
    [:input {:type "button" :value "Register" :on-click
-            #(server-comms/register @email-atom @password-atom)}]])
+            #(server-comms/register! @email-atom @password-atom)}]])
 
 (defn current-page []
   [:div [(session/get :current-page)]])

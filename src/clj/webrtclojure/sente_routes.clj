@@ -66,7 +66,7 @@
 (defmethod -message-handler :webrtclient/anonymous-login
   [{:keys [?data :as user]}]
   (println "Updating account for" user)
-  (accounts/update-user user)
+  (accounts/update-user! user)
   (broadcast-new-user (:id user)))
 
 (defmethod -message-handler :webrtclient/login

@@ -1,6 +1,6 @@
 (ns webrtclojure.server-comms
-  (:require [taoensso.sente :as sente]
-            [webrtclojure.webrtc   :as webrtc]))
+  (:require [taoensso.sente      :as sente]
+            [webrtclojure.webrtc :as webrtc]))
 
 
 ;;; ------------------------
@@ -18,6 +18,7 @@
 
 ;;; -------------------------
 ;;; Message handers for application routes
+
 (def handle-broadcast   nil)
 (def handle-offer       nil)
 (def handle-answer      nil)
@@ -43,6 +44,8 @@
   (set! handle-answer answer)
   (set! handle-candidate candidate))
 
+(defonce uid-atom (atom nil))
+
 ;;; -------------------------
 ;;; Routes
 
@@ -63,14 +66,16 @@
   ;; Indicates when Sente is ready client-side.
   [{:keys [?data]}]
   (if (= ?data {:first-open? true})
-    (.debug js/console "Channel socket successfully established!")
-    (.debug js/console "Channel socket state change: %s" ?data)))
+    (print "Channel socket successfully established!" (swap! uid-atom (:uid ?data)))
+    (print "Channel socket state change: %s" (clj->js ?data))))
 
 (defmethod -message-handler :chsk/handshake
   ;; Handshake for WS
   [{:keys [?data]}]
-  (let [[?uid] ?data]
-    (.debug js/console "Handshake done for: %s" ?uid)))
+  (let [[uid csrf-token] ?data]
+    (print "Handshake gotten with uid:" uid "and csrf:" csrf-token)
+    (reset! uid-atom uid)))
+
 
 ;;; Application specific routes
 
@@ -112,14 +117,15 @@
 ;;; -------------------------
 ;;; Messages to the server
 
-(defn anonymous-login "Log in as a returning anonymous user." [nickname]
+(defn anonymous-login! "Log in as a returning anonymous user." [nickname]
   (channel-send! [:webrtclient/anonymous-login {:nickname nickname}])
-  (.info js/console "Sending anonymous login for " nickname " with id "))
+  (.info js/console "Sending anonymous login for" nickname "with id "))
+(anonymous-login! "hi")
 
-(defn login "Login to the server." [email password]
+(defn login! "Login to the server." [email password]
   (channel-send! [:webrtclient/login {:email email :password password}]))
 
-(defn register "Permanently register your email with a password"
+(defn register! "Permanently register your email with a password"
   [email password]
   (channel-send! [:webrtclient/register
                   {:password password :email email}]))

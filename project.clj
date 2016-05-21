@@ -22,7 +22,7 @@
    [buddy/buddy-hashers "0.14.0"]      ; Hash functions.
    [heroku-database-url-to-jdbc "0.2.2"];Helper function heroku<->korma.
 
-   [org.clojure/clojurescript "1.8.40"
+   [org.clojure/clojurescript "1.8.51"
     :scope "provided"]
    [reagent "0.5.1"                    ; React abstraction.
     :exclusions [org.clojure/tools.reader]]
@@ -91,7 +91,7 @@
                                                 org.clojure/tools.analyzer.jvm]]
                                   [org.clojure/tools.nrepl "0.2.12"]
                                   [com.cemerick/piggieback "0.2.1"]
-                                  ;[figwheel-sidecar "0.5.0-2"]
+                                  [figwheel-sidecar "0.5.3-1"]
                                   [pjstadig/humane-test-output "0.8.0"]
                                   ]
 
