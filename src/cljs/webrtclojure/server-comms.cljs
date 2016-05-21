@@ -16,34 +16,6 @@
   (def channel-state   state)   ; Watchable, read-only atom.
 )
 
-;;; -------------------------
-;;; Message handers for application routes
-
-(def handle-broadcast   nil)
-(def handle-offer       nil)
-(def handle-answer      nil)
-(def handle-candidate   nil)
-
-(defn set-message-handlers!
-  "Sets messages handlers:
-  :broadcast  ; Broadcast message handler
-  :offer      ; Offer message handler"
-  [& {:keys [broadcast offer answer candidate]
-      :as   opts
-      :or   {broadcast       nil
-             offer           nil
-             answer          nil
-             candidate       nil}}]
-  {:pre  [(not (nil? broadcast))
-          (not (nil? offer))
-          (not (nil? answer))
-          (not (nil? candidate))]}
-
-  (set! handle-broadcast broadcast)
-  (set! handle-offer offer)
-  (set! handle-answer answer)
-  (set! handle-candidate candidate))
-
 (defonce uid-atom (atom nil))
 
 ;;; -------------------------
