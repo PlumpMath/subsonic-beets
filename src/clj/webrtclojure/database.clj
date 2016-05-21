@@ -5,7 +5,8 @@
    [ragtime.jdbc :as jdbc]
    [ragtime.repl :as repl]
    [heroku-database-url-to-jdbc.core :as htj])
-  (import org.postgresql.util.PSQLException))
+  (import org.postgresql.util.PSQLException)
+  (import java.sql.BatchUpdateException))
 
 
 ;;; --------------------
@@ -78,7 +79,10 @@
 
 (defn safely "Wrap db-functions in a try-catch." [f]
   (try (f)
-       (catch PSQLException e
-         ((println (.getMessage e))
+       (catch PSQLException pe
+         ((println (.getMessage pe))
           ({:status 500
-            :body   (str "Caught:" (.getMessage e))})))))
+            :body   (str "Caught:" (.getMessage pe))})))
+       (catch BatchUpdateException bue
+         (.printStackTrace (.getNextException bue))
+         (throw bue))))
