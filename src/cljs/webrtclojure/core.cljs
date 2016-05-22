@@ -7,10 +7,15 @@
               [ajax.core :refer [GET POST]] ; Only for testing
               [webrtclojure.server-comms :as server-comms]
               [webrtclojure.webrtc :as webrtc]
-              ))
+              [webrtclojure.chat :as chat]))
 
 ;;; -------------------------
 ;;; Views
+(defn atom-textarea-field [id value disabled]
+  [:textarea {:id id
+              :disabled disabled
+              :value @value
+              :on-change #(reset! value (-> % .-target .-value))}])
 
 (defn atom-field [value placeholder]
 [:input {:type "text"
@@ -18,9 +23,10 @@
          :placeholder placeholder
          :on-change #(reset! value (-> % .-target .-value))}])
 
-(defonce name-atom       (atom ""))
-(defonce email-atom      (atom ""))
-(defonce password-atom   (atom ""))
+(defonce name-atom (atom ""))
+(defonce email-atom (atom ""))
+(defonce password-atom (atom ""))
+(defonce sendtextarea-atom (atom ""))
 
 (defn home-page []
   [:div [:h2 "Welcome to this page!"]
@@ -49,9 +55,12 @@
 (defn chat-page []
   (server-comms/channel-send! [::about])
   [:div {:id :chat} [:h2 "Chat room"]
-   [:div {:id :received} [:textarea {:id :received :disabled true}]]
-   [:div {:id :send} [:textarea {:id :send}] [:input {:id :send-btn :type "button" :value "Send" :on-click
-            #(webrtc/dc-send-message! @name-atom)}]]])
+   [:div {:id :received} (atom-textarea-field :received chat/recvtextarea-atom true)]
+   [:div {:id :send} (atom-textarea-field :send sendtextarea-atom false) 
+            [:input {:id :send-btn :type "button" :value "Send" :on-click
+              (fn [] (webrtc/dc-send-message! @sendtextarea-atom)
+                (chat/append! @name-atom @sendtextarea-atom)
+                (reset! sendtextarea-atom nil))}]]])
 
 (defn current-page []
   [:div [(session/get :current-page)]])
