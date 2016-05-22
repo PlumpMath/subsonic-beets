@@ -1,4 +1,5 @@
-(ns webrtclojure.webrtc)
+(ns webrtclojure.webrtc
+  (:require [webrtclojure.chat :as chat]))
 
 ;;; ------------------------
 ;;; WebRTC connection handler
@@ -43,13 +44,24 @@
 ;;; -------------------------
 ;;; Data channel handlers
 
-(defn dc-receive-message! [message] 
-     (log-message "Recived message: " (aget message "data")))
+(defn dc-receive-message! [user] 
+  (fn [event]
+    (let [message (aget event "data")]
+      (chat/append! user message)
+      (log-message "Recived message: " message))))
 
 (defn dc-send-message! [message] 
      (log-message "Sending message: " message)
      (doseq [peer @connected-peers]
         (.send (get-channel peer) message)))
+
+(defn pc-on-data-channel! [user] 
+  (fn [event]
+   (let [dc (aget event "channel")]
+      (aset dc "onmessage"  (dc-receive-message! user))
+      (aset dc "onopen"     (log-message-fn "Data channel opened."))
+      (aset dc "onclose"    (log-message-fn "Data channel closed."))
+      (aset dc "onerror"    log-message-fn))))
 
 ;;; -------------------------
 ;;; Connection peer handlers
@@ -69,13 +81,6 @@
         (send-fn [:webrtclojure/candidate
                   { :receiver   sender
                     :candidate (.stringify js/JSON (aget event "candidate"))}] 8000))))
-
-(defn pc-on-data-channel! [event] 
-   (let [dc (aget event "channel")]
-      (aset dc "onmessage"  dc-receive-message!)
-      (aset dc "onopen"     (log-message-fn "Data channel opened."))
-      (aset dc "onclose"    (log-message-fn "Data channel closed."))
-      (aset dc "onerror"    log-message-fn)))
 
 ;;; -------------------------
 ;;; Answer handlers
@@ -132,13 +137,13 @@
 
     (let [pc (new js/webkitRTCPeerConnection pc-configuration)
           dc (.createDataChannel pc nil dc-configuration)]
-        (aset dc "onmessage"  dc-receive-message!)
+        (aset dc "onmessage"  (dc-receive-message! sender))
         (aset dc "onopen"     (log-message-fn "Data channel opened."))
         (aset dc "onclose"    (log-message-fn "Data channel closed."))
         (aset dc "onerror"    log-message-fn)
         
         (aset pc "onicecandidate" (pc-on-ice-candidate-fn send-fn sender pc))
-        (aset pc "ondatachannel"  pc-on-data-channel!)
+        (aset pc "ondatachannel"  (pc-on-data-channel! sender))
     
         (let [session (new js/RTCSessionDescription nil)]  
             (aset session "type" (.-type offer))
@@ -157,13 +162,13 @@
     (log-message "New user, processing.")
     (let [pc (new js/webkitRTCPeerConnection pc-configuration)
           dc (.createDataChannel pc nil dc-configuration)]
-        (aset dc "onmessage"  dc-receive-message!)
+        (aset dc "onmessage"  (dc-receive-message! sender))
         (aset dc "onopen"     (log-message-fn "Data channel opened."))
         (aset dc "onclose"    (log-message-fn "Data channel closed."))
         (aset dc "onerror"    log-message-fn)
         
         (aset pc "onicecandidate" (pc-on-ice-candidate-fn send-fn sender pc))
-        (aset pc "ondatachannel"  pc-on-data-channel!)
+        (aset pc "ondatachannel"  (pc-on-data-channel! sender))
 
         (.createOffer pc (offer-success-fn send-fn sender pc)
                          log-message-fn
