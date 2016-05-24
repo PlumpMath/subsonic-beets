@@ -1,5 +1,6 @@
 (ns webrtclojure.server-comms
   (:require [taoensso.sente      :as sente]
+            [ajax.core :refer [GET POST]] ; Only for testing
             [webrtclojure.webrtc :as webrtc]))
 
 
@@ -98,5 +99,6 @@
 
 (defn register! "Permanently register your email with a password"
   [email password]
+  ;; TODO: Add error handling.
   (channel-send! [:webrtclient/register
                   {:password password :email email}]))
