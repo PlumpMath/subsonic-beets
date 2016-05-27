@@ -3,7 +3,8 @@
              [korma.core :refer :all :rename {update sql-update}]
             [buddy.core.nonce :as nonce]
             [buddy.hashers :as hashers]
-            [buddy.core.codecs :as codecs]))
+            [buddy.core.codecs :as codecs]
+            [webrtclojure.util :as util]))
 
 
 ;;; --------------------
@@ -39,7 +40,6 @@
 (def create-anonymous-user! (partial create-user! {:salt "ORM:s suck"}))
 
 (defn update-user! "Update a user account." [uid user]
-  (println uid user)
   (safely #(sql-update db/users
                        (set-fields (salt-n-pepper user))
                        (where {:id uid}))))

@@ -4,7 +4,8 @@
    [korma.db   :refer [defdb postgres default-connection]]
    [ragtime.jdbc :as jdbc]
    [ragtime.repl :as repl]
-   [heroku-database-url-to-jdbc.core :as htj])
+   [heroku-database-url-to-jdbc.core :as htj]
+   [webrtclojure.util :as util])
   (import org.postgresql.util.PSQLException)
   (import java.sql.BatchUpdateException))
 
@@ -80,9 +81,7 @@
 (defn safely "Wrap db-functions in a try-catch." [f]
   (try (f)
        (catch PSQLException pe
-         ((println (.getMessage pe))
-          ({:status 500
-            :body   (str "Caught:" (.getMessage pe))})))
+         (util/tprint (.getMessage pe)))
        (catch BatchUpdateException bue
          (.printStackTrace (.getNextException bue))
-         (throw bue))))
+         (util/tprint (.getMessage bue)))))

@@ -76,12 +76,14 @@
   (broadcast-new-user uid))
 
 (defmethod -message-handler :webrtclient/register
-  [{:keys [uid ?data]}]
-  ;; First do some basic sanity checks
-  (if (and (> (count  (:password ?data)) 7)
-           (re-matches #".+@.+" (:email ?data)))
-    (accounts/update-user! uid ?data)
-    {:status 400 :body "Short password or malformatted email."}))
+  [{:keys [uid ?data ?reply-fn]}]
+  ;; Reply back to the caller with the result of the insert.
+  (?reply-fn
+   (if (< (count  (:password ?data)) 7)
+     "Password too short."
+     (if (not (re-matches #".+@.+" (:email ?data)))
+       "Invalid email adress."
+       (accounts/update-user! uid ?data)))))
 
 
 ;;; Application specific WebRTC routes
