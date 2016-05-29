@@ -33,9 +33,9 @@
    [:div [:a {:href "/about"} "About"]]
    [:div [:a {:href "/register"} "Register"]]
    [atom-field name-atom "Username"]
-   [:input {:type "button" :value "Start" :on-click 
-            #(do (server-comms/anonymous-login! @name-atom) 
-              (secretary/dispatch! "/chat"))}]])
+   [:input {:type "button" :value "Start" :on-click
+            #(do (server-comms/anonymous-login! @name-atom)
+              (accountant/navigate! "/chat"))}]])
 
 (defn about-page []
   (server-comms/channel-send! [::about])
@@ -56,7 +56,7 @@
   (server-comms/channel-send! [::about])
   [:div {:id :chat} [:h2 "Chat room"]
    [:div {:id :received} (atom-textarea-field :received chat/recvtextarea-atom true)]
-   [:div {:id :send} (atom-textarea-field :send sendtextarea-atom false) 
+   [:div {:id :send} (atom-textarea-field :send sendtextarea-atom false)
             [:input {:id :send-btn :type "button" :value "Send" :on-click
               (fn [] (webrtc/dc-send-message! @sendtextarea-atom)
                 (chat/append! @name-atom @sendtextarea-atom)
@@ -66,7 +66,7 @@
   (server-comms/channel-send! [::about])
   [:div {:id :chat} [:h2 "Chat room"]
    [:div {:id :received} (atom-textarea-field :received chat/recvtextarea-atom true)]
-   [:div {:id :send} (atom-textarea-field :send sendtextarea-atom false) 
+   [:div {:id :send} (atom-textarea-field :send sendtextarea-atom false)
             [:input {:id :send-btn :type "button" :value "Send" :on-click
               (fn [] (webrtc/dc-send-message! @sendtextarea-atom)
                 (chat/append! @name-atom @sendtextarea-atom)
