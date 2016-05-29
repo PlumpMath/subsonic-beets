@@ -12,7 +12,7 @@
               connected-uids user-id-fn]}
       (sente/make-channel-socket! sente-web-server-adapter
                                   {:user-id-fn
-                                   (fn [_] (:id (accounts/create-anonymous-user)))})]
+                                   (fn [_] (:id (accounts/create-anonymous-user!)))})]
   (def ring-ajax-post                ajax-post-fn)
   (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
   ;; ChannelSocket's receive channel.
@@ -76,9 +76,15 @@
   (broadcast-new-user uid))
 
 (defmethod -message-handler :webrtclient/register
-  [{:keys [?data]}]
-  (println ?data)
-  (println "STUB: Hook up register to a database."))
+  [{:keys [uid ?data ?reply-fn]}]
+  ;; Reply back to the caller with the result of the insert.
+  (?reply-fn
+   (if (< (count  (:password ?data)) 7)
+     "Password too short."
+     (if (not (re-matches #".+@.+" (:email ?data)))
+       "Invalid email adress."
+       (accounts/update-user! uid ?data)))))
+
 
 ;;; Application specific WebRTC routes
 (defmethod -message-handler :webrtclojure/offer

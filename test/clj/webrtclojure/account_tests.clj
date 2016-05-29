@@ -19,3 +19,17 @@
 
     (testing "Clean up test account"
       (is accounts/delete-user! user-id))))
+
+(deftest register-account-procedure
+  (let [user (accounts/create-anonymous-user!)
+        uid (:id user)]
+    (testing "Normal registry procedure"
+      (is (accounts/update-user! uid {:password "aoeuaeou", :email "ao@aoeu"})))
+    (testing "Accepts the correct password"
+      (is (accounts/correct-password? uid "aoeuaeou")))
+
+    (testing "Rejects incorrect passwords"
+      (is (not (accounts/correct-password? uid "not_my_password"))))
+
+    (testing "Clean up test account"
+      (is accounts/delete-user! uid))))

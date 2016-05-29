@@ -18,9 +18,9 @@
          :placeholder placeholder
          :on-change #(reset! value (-> % .-target .-value))}])
 
-(defonce name-atom     (atom ""))
-(defonce email-atom    (atom ""))
-(defonce password-atom (atom ""))
+(defonce name-atom       (atom ""))
+(defonce email-atom      (atom ""))
+(defonce password-atom   (atom ""))
 
 (defn home-page []
   [:div [:h2 "Welcome to this page!"]
@@ -38,7 +38,8 @@
    [:div [:a {:href "/"} "Go to the home page"]]])
 
 (defn registry-page []
-  [:div [:h2 "Welcome to this page!"]
+  [:div [:h2 "Welcome!"]
+   [:h2 @server-comms/registry-result]
    [:h5 "How you want to be reached:"]
    [atom-field email-atom "Email"]
    [:h5 "Your secret passphrase:"]

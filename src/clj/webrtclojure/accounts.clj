@@ -1,9 +1,10 @@
 (ns webrtclojure.accounts
   (:require [webrtclojure.database :as db :refer [safely]]
-            [korma.core :refer [insert values delete where select fields sql-only]]
+             [korma.core :refer :all :rename {update sql-update}]
             [buddy.core.nonce :as nonce]
             [buddy.hashers :as hashers]
-            [buddy.core.codecs :as codecs]))
+            [buddy.core.codecs :as codecs]
+            [webrtclojure.util :as util]))
 
 
 ;;; --------------------
@@ -15,6 +16,17 @@
 (defn- salt-password [salt password]
   (str salt password))
 
+(defn- salt-n-pepper
+  "Make a user ready for input to the database"
+  [user]
+  (if (contains? user :password)
+    (let [salt (get-salt)]
+      (assoc user
+             :password (hashers/derive
+                        (salt-password salt (:password user)))
+             :salt salt))
+    user))
+
 
 ;;; --------------------
 ;;; Actions
@@ -22,20 +34,15 @@
 (defn create-user! "Create a user account for the given map." [user]
   (safely
    #(insert db/users
-           (values
-            (let [salt (get-salt)]
-              (if (contains? user :password)
-                (assoc user
-                       :password (hashers/derive
-                                  (salt-password salt (:password user)))
-                       :salt salt)
-                user))))))
+           (values (salt-n-pepper user)))))
 
-(def create-anonymous-user (partial create-user! {:salt "ORM:s suck"}))
+;; There must be at least one field in the map sent to KORMA, else it fails.
+(def create-anonymous-user! (partial create-user! {:salt "ORM:s suck"}))
 
-(defn update-user! "Update a user account." [user]
-  (println user)
-  (safely #(update db/users (values user))))
+(defn update-user! "Update a user account." [uid user]
+  (safely #(sql-update db/users
+                       (set-fields (salt-n-pepper user))
+                       (where {:id uid}))))
 
 (defn correct-password?
   "Check whether the given password is correct for the given user id."
