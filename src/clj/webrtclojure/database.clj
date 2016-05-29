@@ -84,4 +84,4 @@
          (util/tprint (.getMessage pe)))
        (catch BatchUpdateException bue
          (.printStackTrace (.getNextException bue))
-         (util/tprint (.getMessage bue)))))
+         (util/tprint (.getMessage (.getNextException bue))))))
