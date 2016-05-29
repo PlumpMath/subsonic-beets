@@ -61,6 +61,16 @@
                 (chat/append! @name-atom @sendtextarea-atom)
                 (reset! sendtextarea-atom nil))}]]])
 
+(defn chat-page []
+  (server-comms/channel-send! [::about])
+  [:div {:id :chat} [:h2 "Chat room"]
+   [:div {:id :received} (atom-textarea-field :received chat/recvtextarea-atom true)]
+   [:div {:id :send} (atom-textarea-field :send sendtextarea-atom false) 
+            [:input {:id :send-btn :type "button" :value "Send" :on-click
+              (fn [] (webrtc/dc-send-message! @sendtextarea-atom)
+                (chat/append! @name-atom @sendtextarea-atom)
+                (reset! sendtextarea-atom nil))}]]])
+
 (defn current-page []
   [:div [(session/get :current-page)]])
 
