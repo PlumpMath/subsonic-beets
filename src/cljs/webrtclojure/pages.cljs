@@ -26,7 +26,7 @@
    [atom-field state/name-atom "Username"]
    [:input {:type "button" :value "Start" :on-click
             #(do (server-comms/anonymous-login! @state/name-atom)
-              (accountant/navigate! "/register"))}]])
+              (accountant/navigate! "/chat"))}]])
 
 (defn about []
   [:div [:h2 "About webrtclojure"]
