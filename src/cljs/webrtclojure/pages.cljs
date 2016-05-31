@@ -44,12 +44,9 @@
 
 (defn chat []
   [:div {:id :chat} [:h2 "Chat room"]
-   [:div {:id :received}
-    (atom-textarea :received state/recvtextarea-atom true)]
-   [:div {:id :send}
-     (atom-textarea :send state/sendtextarea-atom false)
-    [:input {:id :send-btn :type "button" :value "Send" :on-click
-             #(do (webrtc/dc-send-message! @state/sendtextarea-atom)
-                  (state/append! @state/name-atom @state/sendtextarea-atom)
-                  (reset! state/sendtextarea-atom ""))}]]
-   ])
+   (atom-textarea :received state/recvtextarea-atom true)
+   (atom-textarea :send state/sendtextarea-atom false)
+   [:input {:id :send-btn :type "button" :value "Send" :on-click
+            #(do (webrtc/dc-send-message! @state/sendtextarea-atom)
+                 (state/append! state/recvtextarea-atom @state/name-atom @state/sendtextarea-atom)
+                 (reset! state/sendtextarea-atom ""))}]])

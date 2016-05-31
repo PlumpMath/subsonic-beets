@@ -1,10 +1,45 @@
+html, body, div, span, object, iframe,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+  margin:				  0;
+  padding:			  0;
+  border:				  0;
+  outline:			  0;
+  font-size:		  100%;
+  vertical-align: baseline;
+  background:		  transparent;
+}
+
+h1, h2, h3, h4, h5, h6, p, blockquote, pre {
+  padding:			  0;
+  border:				  0;
+  outline:			  0;
+  font-size:		  100%;
+  vertical-align: baseline;
+  background:		  transparent;
+}
+
+html, div#app {
+	height: 100%;
+}
+
+body {
+	margin: 2em 1em 0 1em;
+	height: calc(100% - 3em);
+}
+
+
 body {
 	font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
-	max-width: 600px;
-	margin: 0 auto;
-	padding-top: 16px;
 	-webkit-font-smoothing: antialiased;
-	font-size: 1.125em;
 	color: #333;
 	line-height: 1.5em;
 }
@@ -38,50 +73,38 @@ a:hover {
 }
 
 input {
+	padding: 3px;
 	width: 20em;
 }
 
-textarea {
-    color: #444;
-    font-size: 0.9em;
-    height: calc(100% - 10px);
-    width: calc(100%);
-    padding:0;
-	background-color: #fff;
-}
 
-div#chat { 
-    height: 500px;
-}
-div#received {
-    height: calc(80%);
-}
-
-div#send {
-    height: calc(20%);
-    display: inline-block;
-    width: calc(100%);   
+div#chat {
+  height: 100%;
 }
 
 #send-btn {
 	background-color: #3498db;
-    border: none;
-    color: white;
-    font-size: 0.8em;
-    padding: 0.5em 0.7em 0.6em 0.7em;
-    width: calc(30%);
-    height: calc(100% - 10px);
-    float:right;
+  border: none;
+  color: white;
+  font-size: 0.8em;
+  padding: 0.5em 0.7em 0.6em 0.7em;
+  width: 30%;
+	height: calc(20% + 6px);
+  float:right;
 }
 
 #send-btn:hover {
-    background-color: #3cb0fd;
+  background-color: #3cb0fd;
 }
 
 textarea#received {
+	height: calc(75% - 4em);
+  width: calc(100% - 6px);
+	background-color: #fff;
 	overflow: hidden;
 }
 
 textarea#send {
-    width: calc(70% - 5px);
+  height: 20%;
+	width: calc(70% - 8px);
 }

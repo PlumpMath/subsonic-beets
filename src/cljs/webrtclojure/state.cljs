@@ -10,10 +10,10 @@
 (defonce password-atom (atom ""))
 (defonce recvtextarea-atom (atom ""))
 (defonce sendtextarea-atom (atom ""))
-
+(defonce connected-peers-atom (atom {}))
 
 ;;; -------------------------
 ;;; Helper functions
 
-(defn append! [user message]
-  (swap! recvtextarea-atom str (str user ": " message "\n")))
+(defn append! [atom user message]
+  (swap! atom str (str user ": " message "\n")))

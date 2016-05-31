@@ -13,7 +13,7 @@
 ;;; State
 
 (defn current-page []
-  [:div [(session/get :current-page)]])
+  [(session/get :current-page)])
 
 ;;; -------------------------
 ;;; Routes
