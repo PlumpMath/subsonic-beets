@@ -20,7 +20,7 @@
    [ragtime "0.5.3"]                   ; Database migrations.
    [buddy/buddy-core "0.12.1"]         ; Authorization and authentication.
    [buddy/buddy-hashers "0.14.0"]      ; Hash functions.
-   [heroku-database-url-to-jdbc "0.2.2"];Helper function heroku<->korma.
+   ]
 
    [org.clojure/clojurescript "1.8.51"
     :scope "provided"]

@@ -20,7 +20,7 @@
 
 
 (defn home []
-  [:div [:h2 "Welcome to this page!"]
+  [:div [:h2 "Welcome to WebRTClojure!"]
    [:div [:a {:href "/about"} "About"]]
    [:div [:a {:href "/register"} "Register"]]
    [atom-field state/name-atom "Username"]
