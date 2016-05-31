@@ -1,6 +1,6 @@
 (ns webrtclojure.accounts
   (:require [webrtclojure.database :as db :refer [safely]]
-             [korma.core :refer :all :rename {update sql-update}]
+            [korma.core :refer :all :rename {update sql-update}]
             [buddy.core.nonce :as nonce]
             [buddy.hashers :as hashers]
             [buddy.core.codecs :as codecs]
@@ -11,7 +11,7 @@
 ;;; Helper functions
 
 (defn- get-salt "Get a salt to add to your user data." []
-  (codecs/bytes->str (nonce/random-bytes 16)))
+  (str (nonce/random-bytes 16)))
 
 (defn- salt-password [salt password]
   (str salt password))
