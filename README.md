@@ -19,23 +19,6 @@ Browser‾‾‾‾‾‾‾‾Browser
        Server
 ```
 
-Specifically this will be achieved through a server written in Clojure using the following libraries:
-
-	The web programming framework Ring.
-	The web server HTTPKit.
-
-
-On the client side we will use ClojureScript and the following technologies:
-
-	The client framework ReactJS through the ClojureScript library Reagent.
-	The development tool figwheel - live programming!
-
-The following libraries will be used on both the front and back ends:
-
-	The routing library bidi.
-	The HTTP and WebSocket connection handler Sente.
-
-
 Automatic deployment will be managed through Heroku and its GitHub integration.
 
 Testing will be done with the help of Travis.

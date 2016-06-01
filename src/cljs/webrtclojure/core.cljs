@@ -7,60 +7,28 @@
               [ajax.core :refer [GET POST]] ; Only for testing
               [webrtclojure.server-comms :as server-comms]
               [webrtclojure.webrtc :as webrtc]
-              ))
+              [webrtclojure.pages :as pages]))
 
 ;;; -------------------------
-;;; Views
-
-(defn atom-field [value placeholder]
-[:input {:type "text"
-         :value @value
-         :placeholder placeholder
-         :on-change #(reset! value (-> % .-target .-value))}])
-
-(defonce name-atom       (atom ""))
-(defonce email-atom      (atom ""))
-(defonce password-atom   (atom ""))
-
-(defn home-page []
-  [:div [:h2 "Welcome to this page!"]
-   [:div [:a {:href "/about"} "About"]]
-   [:div [:a {:href "/register"} "Register"]]
-   [atom-field name-atom "Username"]
-   [:input {:type "button" :value "Start" :on-click
-            #(server-comms/anonymous-login! @name-atom)}]
-   [:input {:type "button" :value "Send" :on-click
-            #(webrtc/dc-send-message! @name-atom)}]])
-
-(defn about-page []
-  (server-comms/channel-send! [::about])
-  [:div [:h2 "About webrtclojure"]
-   [:div [:a {:href "/"} "Go to the home page"]]])
-
-(defn registry-page []
-  [:div [:h2 "Welcome!"]
-   [:h2 @server-comms/registry-result]
-   [:h5 "How you want to be reached:"]
-   [atom-field email-atom "Email"]
-   [:h5 "Your secret passphrase:"]
-   [atom-field password-atom "Password"]
-   [:input {:type "button" :value "Register" :on-click
-            #(server-comms/register! @email-atom @password-atom)}]])
+;;; State
 
 (defn current-page []
-  [:div [(session/get :current-page)]])
+  [(session/get :current-page)])
 
 ;;; -------------------------
 ;;; Routes
 
 (secretary/defroute "/" []
-  (session/put! :current-page #'home-page))
+  (session/put! :current-page #'pages/home))
 
 (secretary/defroute "/about" []
-  (session/put! :current-page #'about-page))
+  (session/put! :current-page #'pages/about))
 
 (secretary/defroute "/register" []
-  (session/put! :current-page #'registry-page))
+  (session/put! :current-page #'pages/registry))
+
+(secretary/defroute "/chat" []
+  (session/put! :current-page #'pages/chat))
 
 ;;; -------------------------
 ;;; Initialize app

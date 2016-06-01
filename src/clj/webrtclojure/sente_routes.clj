@@ -64,10 +64,10 @@
 
 ;;; Application specific authentication routes
 (defmethod -message-handler :webrtclient/anonymous-login
-  [{:keys [?data :as user]}]
-  (println "Updating account for" user)
-  (accounts/update-user! user)
-  (broadcast-new-user (:id user)))
+  [{:keys [uid ?data ?reply-fn]}]
+  (if (not (= 1 (accounts/update-user! uid ?data)))
+    (println "Error in anonymous login with uid:" uid "and user" ?data))
+  (broadcast-new-user uid))
 
 (defmethod -message-handler :webrtclient/login
   [{:keys [uid ?data]}]

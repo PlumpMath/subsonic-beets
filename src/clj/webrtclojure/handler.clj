@@ -13,6 +13,7 @@
   (GET  "/" [] loading-page)
   (GET  "/about" [] loading-page)
   (GET  "/register" [] loading-page)
+  (GET  "/chat" [] loading-page)
   ;; Sente
   (GET  "/sente" req (sente-routes/ring-ajax-get-or-ws-handshake req))
   (POST "/sente" req (sente-routes/ring-ajax-post                req))
