@@ -10,24 +10,27 @@
     #js { "url" "stun:stun1.l.google.com:19302" } ]})
 
 (def ^:const dc-configuration  #js {
-  :ordered false        ; use UDP
-  :protocol "SCTP"
-  :maxRetransmitTime 1000 })
+  :reliable true
+  :ordered true
+  :protocol "SCTP"})
 
 (def ^:const sdp-constraints #js {
   "mandatory" #js {
     "OfferToReceiveAudio" false
     "OfferToReceiveVideo" false } })
 
+(defn tprint
+  "Transparent print. Do a println and return the value being printed."
+  [retval] (doto retval println))
 
 (defn add-peer [peer connection channel]
-  (swap! state/connected-peers-atom  assoc :peer {:connection connection :channel channel}))
+  (swap! state/connected-peers-atom assoc peer {:connection connection :channel channel}))
 
 (defn get-connection [peer]
-  (:connection (:peer @state/connected-peers-atom)))
+  (:connection (tprint (@state/connected-peers-atom peer))))
 
 (defn get-channel [peer]
-  (:channel (:peer @state/connected-peers-atom)))
+  (:channel ((tprint @state/connected-peers-atom) peer)))
 
 
 ;;; -------------------------
@@ -42,7 +45,7 @@
 (defn dc-send-message! [message]
   (print "Sending message: " message)
   (doseq [peer @state/connected-peers-atom]
-    (.send (get-channel peer) message)))
+    (.send (:channel (second peer)) message)))
 
 (defn pc-on-data-channel! [user]
   (fn [event]
@@ -96,6 +99,16 @@
     (send-fn [:webrtclojure/answer  { :receiver sender
                                      :answer    (.stringify js/JSON answer)}] 8000)))
 
+
+;;; -------------------------
+;;; Constructors
+(defn- create-data-channel [peer-connection sender]
+  (let [dc (.createDataChannel peer-connection sender dc-configuration)]
+    (aset dc "onmessage"  (dc-receive-message! sender))
+    (aset dc "onopen"     #(print "Data channel opened."))
+    (aset dc "onclose"    #(print "Data channel closed."))
+    (aset dc "onerror"    print)))
+
 ;;; -------------------------
 ;;; Offer handlers
 (defn offer-success-fn
@@ -125,7 +138,7 @@
   (print "Recived an offer, processing.")
 
   (let [pc (new js/webkitRTCPeerConnection pc-configuration)
-        dc (.createDataChannel pc nil dc-configuration)]
+        dc (.createDataChannel pc sender dc-configuration)]
     (aset dc "onmessage"  (dc-receive-message! sender))
     (aset dc "onopen"     #(print "Data channel opened."))
     (aset dc "onclose"    #(print "Data channel closed."))
@@ -150,12 +163,7 @@
   [send-fn sender]
   (print "New user, processing.")
   (let [pc (new js/webkitRTCPeerConnection pc-configuration)
-        dc (.createDataChannel pc nil dc-configuration)]
-    (aset dc "onmessage"  (dc-receive-message! sender))
-    (aset dc "onopen"     #(print "Data channel opened."))
-    (aset dc "onclose"    #(print "Data channel closed."))
-    (aset dc "onerror"    print)
-
+        dc (create-data-channel pc sender)]
     (aset pc "onicecandidate" (pc-on-ice-candidate-fn send-fn sender pc))
     (aset pc "ondatachannel"  (pc-on-data-channel! sender))
 
