@@ -60,7 +60,7 @@
 (defn process-candidate!
   "Process recived candidate"
   [send-fn sender candidate]
-  (.debug js/console "# Recived an candidate, processing.")
+  (print "# Recived an candidate, processing.")
   (.addIceCandidate (get-connection sender) (new js/RTCIceCandidate candidate)
                     #(print "Candidate successfully added.")
                     print))
@@ -107,7 +107,17 @@
     (aset dc "onmessage"  (dc-receive-message! sender))
     (aset dc "onopen"     #(print "Data channel opened."))
     (aset dc "onclose"    #(print "Data channel closed."))
-    (aset dc "onerror"    print)))
+    (aset dc "onerror"    print)
+    ;; return dc
+    dc))
+
+(defn- create-peer-connection [send-fn sender]
+  (let [pc (new js/webkitRTCPeerConnection pc-configuration)]
+    (aset pc "onicecandidate" (pc-on-ice-candidate-fn send-fn sender pc))
+    (aset pc "ondatachannel"  (pc-on-data-channel! sender))
+    ;; return dc
+    pc))
+
 
 ;;; -------------------------
 ;;; Offer handlers
@@ -137,16 +147,8 @@
   [send-fn sender offer]
   (print "Recived an offer, processing.")
 
-  (let [pc (new js/webkitRTCPeerConnection pc-configuration)
-        dc (.createDataChannel pc sender dc-configuration)]
-    (aset dc "onmessage"  (dc-receive-message! sender))
-    (aset dc "onopen"     #(print "Data channel opened."))
-    (aset dc "onclose"    #(print "Data channel closed."))
-    (aset dc "onerror"    print)
-
-    (aset pc "onicecandidate" (pc-on-ice-candidate-fn send-fn sender pc))
-    (aset pc "ondatachannel"  (pc-on-data-channel! sender))
-
+  (let [pc (create-peer-connection send-fn sender)
+        dc (create-data-channel pc sender)]
     (let [session (new js/RTCSessionDescription nil)]
       (aset session "type" (.-type offer))
       (aset session "sdp"  (.-sdp offer))
@@ -162,13 +164,9 @@
   "Process new users"
   [send-fn sender]
   (print "New user, processing.")
-  (let [pc (new js/webkitRTCPeerConnection pc-configuration)
+  (let [pc (create-peer-connection send-fn sender)
         dc (create-data-channel pc sender)]
-    (aset pc "onicecandidate" (pc-on-ice-candidate-fn send-fn sender pc))
-    (aset pc "ondatachannel"  (pc-on-data-channel! sender))
-
     (.createOffer pc (offer-success-fn send-fn sender pc)
                   print
                   sdp-constraints)
-
     (add-peer sender pc dc)))
