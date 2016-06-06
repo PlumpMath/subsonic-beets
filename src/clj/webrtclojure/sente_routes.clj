@@ -32,9 +32,9 @@
         (channel-send! uid [func data] 8000))))
 
 (defn broadcast-new-user
-  [user]
+  [uid nickname]
   "Broadcast the newly connected user"
-  (broadcast :webrtclojure/new-user {:user user} user))
+  (broadcast :webrtclojure/new-user {:user uid :nickname nickname} uid))
 
 ;;; -------------------------
 ;;; Routes
@@ -67,13 +67,13 @@
   [{:keys [uid ?data ?reply-fn]}]
   (if (not (= 1 (accounts/update-user! uid ?data)))
     (println "Error in anonymous login with uid:" uid "and user" ?data))
-  (broadcast-new-user uid))
+  (broadcast-new-user uid (:nickname ?data)))
 
 (defmethod -message-handler :webrtclient/login
   [{:keys [uid ?data]}]
   (println ?data)
   (println "STUB: Hook up login to a database.")
-  (broadcast-new-user uid))
+  (broadcast-new-user uid (:nickname ?data)))
 
 (defmethod -message-handler :webrtclient/register
   [{:keys [uid ?data ?reply-fn]}]
@@ -90,23 +90,20 @@
 (defmethod -message-handler :webrtclojure/offer
   [{:keys [uid event ?data]}]
   (println "Server received an offer, processing ")
-  (channel-send!  (:receiver (get-in event[1]))
-                  [:webrtclojure/offer  {:sender uid
-                                          :offer  (:offer (get-in event[1]))}]))
+  (channel-send!  (:receiver ?data)
+                  [:webrtclojure/offer {:sender uid :offer (:offer ?data) :nickname (:nickname ?data)}]))
 
 (defmethod -message-handler :webrtclojure/answer
   [{:keys [uid event ?data]}]
   (println "Server received an answer, processing ")
-  (channel-send!  (:receiver (get-in event[1]))
-                  [:webrtclojure/answer  {:sender uid
-                                          :answer  (:answer (get-in event[1]))}]))
+  (channel-send!  (:receiver ?data)
+                  [:webrtclojure/answer {:sender uid :answer (:answer ?data)}]))
 
 (defmethod -message-handler :webrtclojure/candidate
   [{:keys [uid event ?data]}]
   (println "Server received an candidate, processing ")
-  (channel-send!  (:receiver (get-in event[1]))
-                  [:webrtclojure/candidate  {:sender uid
-                                             :candidate  (:candidate (get-in event[1]))}]))
+  (channel-send!  (:receiver ?data)
+                  [:webrtclojure/candidate {:sender uid :candidate (:candidate ?data)}]))
 
 ;;; -------------------------
 ;;; Router lifecycle.

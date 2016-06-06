@@ -23,15 +23,17 @@
   "Transparent print. Do a println and return the value being printed."
   [retval] (doto retval println))
 
-(defn add-peer [peer connection channel]
-  (swap! state/connected-peers-atom assoc peer {:connection connection :channel channel}))
+(defn add-peer [peer connection channel nickname]
+  (swap! state/connected-peers-atom assoc peer {:connection connection :channel channel :nickname nickname}))
 
 (defn get-connection [peer]
-  (:connection (tprint (@state/connected-peers-atom peer))))
+  (:connection (@state/connected-peers-atom peer)))
 
 (defn get-channel [peer]
-  (:channel ((tprint @state/connected-peers-atom) peer)))
+  (:channel (@state/connected-peers-atom peer)))
 
+(defn get-nickname [peer]
+  (:nickname (@state/connected-peers-atom peer)))
 
 ;;; -------------------------
 ;;; Data channel handlers
@@ -47,10 +49,10 @@
   (doseq [peer @state/connected-peers-atom]
     (.send (:channel (second peer)) message)))
 
-(defn pc-on-data-channel! [user]
+(defn pc-on-data-channel! [sender]
   (fn [event]
     (let [dc (aget event "channel")]
-      (aset dc "onmessage"  (dc-receive-message! user))
+      (aset dc "onmessage"  (dc-receive-message! (get-nickname sender)))
       (aset dc "onopen"     #(print "Data channel opened."))
       (aset dc "onclose"    #(print "Data channel closed."))
       (aset dc "onerror"    print))))
@@ -129,8 +131,9 @@
     (.setLocalDescription pc offer
                           #(print "Successfully added local description.")
                           print)
-    (send-fn [:webrtclojure/offer { :receiver sender
-                                   :offer     (.stringify js/JSON offer)}] 8000)))
+    (send-fn [:webrtclojure/offer { :receiver  sender
+                                    :offer     (.stringify js/JSON offer)
+                                    :nickname  @state/name-atom}] 8000)))
 
 (defn session-success-fn
   "Callback function for newly created sessions"
@@ -144,9 +147,8 @@
 
 (defn process-offer!
   "Process newly recived offers"
-  [send-fn sender offer]
+  [send-fn sender nickname offer]
   (print "Recived an offer, processing.")
-
   (let [pc (create-peer-connection send-fn sender)
         dc (create-data-channel pc sender)]
     (let [session (new js/RTCSessionDescription nil)]
@@ -155,18 +157,18 @@
       (.setRemoteDescription pc session
                              (session-success-fn send-fn sender pc)
                              print))
-    (add-peer sender pc dc)))
+    (add-peer sender pc dc nickname)))
 
 ;;; -------------------------
 ;;; New user handlers
 
 (defn process-new-user!
   "Process new users"
-  [send-fn sender]
-  (print "New user, processing.")
+  [send-fn sender nickname]
+  (print "New user, processing. " sender nickname)
   (let [pc (create-peer-connection send-fn sender)
         dc (create-data-channel pc sender)]
     (.createOffer pc (offer-success-fn send-fn sender pc)
                   print
                   sdp-constraints)
-    (add-peer sender pc dc)))
+    (add-peer sender pc dc nickname)))

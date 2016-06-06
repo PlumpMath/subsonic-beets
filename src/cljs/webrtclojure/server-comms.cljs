@@ -56,25 +56,19 @@
 
 (defmethod -message-handler :webrtclojure/new-user
   [{:as ev-msg :keys [event uid ?data]}]
-  (webrtc/process-new-user! channel-send! (:user (get-in event[1]))))
+  (webrtc/process-new-user! channel-send! (:user ?data) (:nickname ?data)))
 
 (defmethod -message-handler :webrtclojure/offer
   [{:as ev-msg :keys [event uid ?data]}]
-  (webrtc/process-offer! channel-send!
-                         (:sender (get-in event[1]))
-                         (.parse js/JSON (:offer (get-in event[1])))))
+  (webrtc/process-offer! channel-send! (:sender ?data) (:nickname ?data) (.parse js/JSON (:offer ?data))))
 
 (defmethod -message-handler :webrtclojure/answer
   [{:as ev-msg :keys [event uid ?data]}]
-  (webrtc/process-answer! channel-send!
-                         (:sender (get-in event[1]))
-                         (.parse js/JSON (:answer (get-in event[1])))))
+  (webrtc/process-answer! channel-send! (:sender ?data) (.parse js/JSON (:answer ?data))))
 
 (defmethod -message-handler :webrtclojure/candidate
   [{:as ev-msg :keys [event uid ?data]}]
-  (webrtc/process-candidate! channel-send!
-                         (:sender (get-in event[1]))
-                         (.parse js/JSON (:candidate (get-in event[1])))))
+  (webrtc/process-candidate! channel-send! (:sender ?data) (.parse js/JSON (:candidate ?data))))
 
 
 ;;; -------------------------
