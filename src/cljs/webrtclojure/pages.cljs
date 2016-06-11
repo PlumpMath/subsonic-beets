@@ -6,8 +6,8 @@
             [webrtclojure.server-comms :as server-comms]))
 
 
-(defn atom-field [value placeholder]
-[:input {:type "text"
+(defn atom-field [value placeholder type]
+[:input {:type type
          :value @value
          :placeholder placeholder
          :on-change #(reset! value (-> % .-target .-value))}])
@@ -23,7 +23,7 @@
   [:div [:h2 "Welcome to WebRTClojure!"]
    [:div [:a {:href "/about"} "About"]]
    [:div [:a {:href "/register"} "Register"]]
-   [atom-field state/name-atom "Username"]
+   [atom-field state/name-atom "Nickname" "text"]
    [:input {:type "button" :value "Start" :on-click
             #(do (server-comms/anonymous-login! @state/name-atom)
               (accountant/navigate! "/chat"))}]])
@@ -36,9 +36,9 @@
   [:div [:h2 "Welcome!"]
    [:h2 @server-comms/registry-result]
    [:h5 "How you want to be reached:"]
-   [atom-field state/email-atom "Email"]
+   [atom-field state/email-atom "Email" "text"]
    [:h5 "Your secret passphrase:"]
-   [atom-field state/password-atom "Password"]
+   [atom-field state/password-atom "Password" "password"]
    [:input {:type "button" :value "Register" :on-click
             #(server-comms/register! @state/email-atom @state/password-atom)}]])
 
