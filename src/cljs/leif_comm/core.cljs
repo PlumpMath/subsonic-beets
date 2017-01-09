@@ -3,10 +3,7 @@
               [reagent.session :as session]
               [secretary.core :as secretary]
               [accountant.core :as accountant]
-              [taoensso.sente  :as sente]
-              [ajax.core :refer [GET POST]] ; Only for testing
               [leif-comm.server-comms :as server-comms]
-              [leif-comm.webrtc :as webrtc]
               [leif-comm.pages :as pages]))
 
 ;;; -------------------------

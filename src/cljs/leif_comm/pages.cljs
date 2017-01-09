@@ -43,10 +43,12 @@
             #(server-comms/register! @state/email-atom @state/password-atom)}]])
 
 (defn chat []
-  [:div {:id :chat} [:h2 "Chat room"]
-   (atom-textarea :received state/recvtextarea-atom true)
-   (atom-textarea :send state/sendtextarea-atom false)
+  [:div {:id :chat}
+   [:h2 "Chat room"]
+   [:a {:href "/"} "Back"]
+   [atom-textarea :received state/recvtextarea-atom true]
+   [atom-textarea :send state/sendtextarea-atom false]
    [:input {:id :send-btn :type "button" :value "Send" :on-click
-            #(do (webrtc/dc-send-message! @state/sendtextarea-atom)
+            #(do (server-comms/send-message! @state/sendtextarea-atom)
                  (state/append! state/recvtextarea-atom @state/name-atom @state/sendtextarea-atom)
                  (reset! state/sendtextarea-atom ""))}]])

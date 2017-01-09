@@ -1,5 +1,6 @@
 (ns leif-comm.sente-routes
-  (:require [taoensso.sente :as sente]
+  (:require [leif-comm.state :as state]
+            [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit
              :refer [sente-web-server-adapter]]
             [leif-comm.accounts :as accounts]))
@@ -104,6 +105,11 @@
   (println "Server received an candidate, processing ")
   (channel-send!  (:receiver ?data)
                   [:leif-comm/candidate {:sender uid :candidate (:candidate ?data)}]))
+
+(defmethod -message-handler :leif-comm.server-comms/send-message
+  [{:keys [uid event ?data]}]
+  (println ?data)
+  (swap! state/messages conj ?data))
 
 ;;; -------------------------
 ;;; Router lifecycle.

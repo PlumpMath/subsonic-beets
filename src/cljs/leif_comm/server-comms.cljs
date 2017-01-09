@@ -14,7 +14,7 @@
                                    :wrap-recv-evs? false})] ; Auto-unwrap :chsk/recv
   (def channel         chsk)    ; Sentes pseudo socket, channel-socket.
   (def receive-channel ch-recv) ; ChannelSocket's receive channel.
-  (def channel-send!   send-fn) ; ChannelSocket's send API fn.
+  (def send!   send-fn) ; ChannelSocket's send API fn.
   (def channel-state   state))  ; Watchable, read-only atom.
 
 
@@ -56,19 +56,19 @@
 
 (defmethod -message-handler :leif-comm/new-user
   [{:as ev-msg :keys [event uid ?data]}]
-  (webrtc/process-new-user! channel-send! (:user ?data) (:nickname ?data)))
+  (webrtc/process-new-user! send! (:user ?data) (:nickname ?data)))
 
 (defmethod -message-handler :leif-comm/offer
   [{:as ev-msg :keys [event uid ?data]}]
-  (webrtc/process-offer! channel-send! (:sender ?data) (:nickname ?data) (.parse js/JSON (:offer ?data))))
+  (webrtc/process-offer! send! (:sender ?data) (:nickname ?data) (.parse js/JSON (:offer ?data))))
 
 (defmethod -message-handler :leif-comm/answer
   [{:as ev-msg :keys [event uid ?data]}]
-  (webrtc/process-answer! channel-send! (:sender ?data) (.parse js/JSON (:answer ?data))))
+  (webrtc/process-answer! send! (:sender ?data) (.parse js/JSON (:answer ?data))))
 
 (defmethod -message-handler :leif-comm/candidate
   [{:as ev-msg :keys [event uid ?data]}]
-  (webrtc/process-candidate! channel-send! (:sender ?data) (.parse js/JSON (:candidate ?data))))
+  (webrtc/process-candidate! send! (:sender ?data) (.parse js/JSON (:candidate ?data))))
 
 
 ;;; -------------------------
@@ -87,19 +87,24 @@
 ;;; Messages to the server
 
 (defn anonymous-login! "Log in as a returning anonymous user." [nickname]
-  (channel-send! [:webrtclient/anonymous-login {:nickname nickname}])
+  (send! [:webrtclient/anonymous-login {:nickname nickname}])
   (.info js/console "Sending anonymous login for" nickname))
 
 (defn login! "Login to the server." [email password]
-  (channel-send! [:webrtclient/login {:email email :password password}]))
+  (send! [:webrtclient/login {:email email :password password}]))
 
 (defn register! "Permanently register your email with a password"
   [email password]
   ;; TODO: Add error handling.
-  (channel-send! [:webrtclient/register {:password password :email email}]
+  (send! [:webrtclient/register {:password password :email email}]
                  5000
                  (fn [reply]
                    (reset! registry-result
                            (if (string? reply) ; If failure message string.
                              reply
                              "You have been registered!")))))
+
+(defn send-message!
+  "Send a message to the chat room"
+  [text]
+  (send! [::send-message {:text text}]))
