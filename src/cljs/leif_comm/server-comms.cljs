@@ -1,7 +1,7 @@
 (ns leif-comm.server-comms
   (:require [taoensso.sente      :as sente]
             [ajax.core :refer [GET POST]] ; Only for testing
-            [leif-comm.webrtc :as webrtc]
+            [leif-comm.state :as state]
             [reagent.core :as reagent :refer [atom]]))
 
 
@@ -16,12 +16,6 @@
   (def receive-channel ch-recv) ; ChannelSocket's receive channel.
   (def send!   send-fn) ; ChannelSocket's send API fn.
   (def channel-state   state))  ; Watchable, read-only atom.
-
-
-;;; ------------------------
-;;; State
-(defonce registry-result (atom ""))
-
 
 ;;; -------------------------
 ;;; Routes
@@ -52,25 +46,6 @@
     (print "Handshake gotten with uid:" uid "and csrf:" csrf-token)))
 
 
-;;; Application specific routes
-
-(defmethod -message-handler :leif-comm/new-user
-  [{:as ev-msg :keys [event uid ?data]}]
-  (webrtc/process-new-user! send! (:user ?data) (:nickname ?data)))
-
-(defmethod -message-handler :leif-comm/offer
-  [{:as ev-msg :keys [event uid ?data]}]
-  (webrtc/process-offer! send! (:sender ?data) (:nickname ?data) (.parse js/JSON (:offer ?data))))
-
-(defmethod -message-handler :leif-comm/answer
-  [{:as ev-msg :keys [event uid ?data]}]
-  (webrtc/process-answer! send! (:sender ?data) (.parse js/JSON (:answer ?data))))
-
-(defmethod -message-handler :leif-comm/candidate
-  [{:as ev-msg :keys [event uid ?data]}]
-  (webrtc/process-candidate! send! (:sender ?data) (.parse js/JSON (:candidate ?data))))
-
-
 ;;; -------------------------
 ;;; Router lifecycle.
 
@@ -93,18 +68,7 @@
 (defn login! "Login to the server." [email password]
   (send! [:webrtclient/login {:email email :password password}]))
 
-(defn register! "Permanently register your email with a password"
-  [email password]
-  ;; TODO: Add error handling.
-  (send! [:webrtclient/register {:password password :email email}]
-                 5000
-                 (fn [reply]
-                   (reset! registry-result
-                           (if (string? reply) ; If failure message string.
-                             reply
-                             "You have been registered!")))))
-
 (defn send-message!
   "Send a message to the chat room"
   [text]
-  (send! [::send-message {:text text}]))
+  (send! [::send-message {:text text :author @state/name-atom}]))

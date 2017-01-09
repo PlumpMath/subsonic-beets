@@ -18,12 +18,6 @@
 (secretary/defroute "/" []
   (session/put! :current-page #'pages/home))
 
-(secretary/defroute "/about" []
-  (session/put! :current-page #'pages/about))
-
-(secretary/defroute "/register" []
-  (session/put! :current-page #'pages/registry))
-
 (secretary/defroute "/chat" []
   (session/put! :current-page #'pages/chat))
 

@@ -6,17 +6,17 @@
             [leif-comm.server-comms :as server-comms]))
 
 
-(defn atom-field [value placeholder type]
+(defn atom-field [atom placeholder type]
 [:input {:type type
-         :value @value
+         :value @atom
          :placeholder placeholder
-         :on-change #(reset! value (-> % .-target .-value))}])
+         :on-change #(reset! atom (-> % .-target .-value))}])
 
-(defn atom-textarea [id value disabled]
+(defn atom-textarea [id atom disabled]
   [:textarea {:id id
               :disabled disabled
-              :value @value
-              :on-change #(reset! value (-> % .-target .-value))}])
+              :value @atom
+              :on-change #(reset! atom (-> % .-target .-value))}])
 
 
 (defn home []
@@ -28,24 +28,11 @@
             #(do (server-comms/anonymous-login! @state/name-atom)
               (accountant/navigate! "/chat"))}]])
 
-(defn about []
-  [:div [:h2 "About leif-comm"]
-   [:div [:a {:href "/"} "Go to the home page"]]])
-
-(defn registry []
-  [:div [:h2 "Welcome!"]
-   [:h2 @server-comms/registry-result]
-   [:h5 "How you want to be reached:"]
-   [atom-field state/email-atom "Email" "text"]
-   [:h5 "Your secret passphrase:"]
-   [atom-field state/password-atom "Password" "password"]
-   [:input {:type "button" :value "Register" :on-click
-            #(server-comms/register! @state/email-atom @state/password-atom)}]])
-
 (defn chat []
   [:div {:id :chat}
    [:h2 "Chat room"]
-   [:a {:href "/"} "Back"]
+   [:a {:href "/"} "Back"][:br]
+   [atom-field state/name-atom "Nickname" "text"]
    [atom-textarea :received state/recvtextarea-atom true]
    [atom-textarea :send state/sendtextarea-atom false]
    [:input {:id :send-btn :type "button" :value "Send" :on-click
