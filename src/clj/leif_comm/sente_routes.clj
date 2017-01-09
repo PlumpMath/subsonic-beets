@@ -2,25 +2,20 @@
   (:require [leif-comm.state :as state]
             [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit
-             :refer [sente-web-server-adapter]]
-            [leif-comm.accounts :as accounts]))
+             :refer [sente-web-server-adapter]]))
 
 ;;; -------------------------
 ;;; Setup
-
-(let [{:keys [ch-recv send-fn ajax-post-fn
+(let [uid-counter (atom 0)
+      {:keys [ch-recv send-fn ajax-post-fn
               ajax-get-or-ws-handshake-fn
               connected-uids user-id-fn]}
       (sente/make-channel-socket! sente-web-server-adapter
-                                  {:user-id-fn
-                                   (fn [_] (:id (accounts/create-anonymous-user!)))})]
+                                  {:user-id-fn (fn [_] (swap! uid-counter inc))})]
   (def ring-ajax-post                ajax-post-fn)
   (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
-  ;; ChannelSocket's receive channel.
   (def receive-channel               ch-recv)
-  ;; ChannelSocket's send API func.
-  (def channel-send!                 send-fn)
-  ; Watchable, read-only atom.
+  (def send!                         send-fn)
   (def connected-uids                connected-uids))
 
 ;;; -------------------------
@@ -30,7 +25,7 @@
   [func data caller]
   (doseq [uid (:any @connected-uids)]
       (if (not= uid caller)
-        (channel-send! uid [func data] 8000))))
+        (send! uid [func data] 8000))))
 
 (defn broadcast-new-user
   [uid nickname]
@@ -63,47 +58,26 @@
 (defmethod -message-handler :chsk/ws-ping [_])
 
 
-;;; Application specific authentication routes
-(defmethod -message-handler :webrtclient/anonymous-login
-  [{:keys [uid ?data ?reply-fn]}]
-  (if (not (= 1 (accounts/update-user! uid ?data)))
-    (println "Error in anonymous login with uid:" uid "and user" ?data))
-  (broadcast-new-user uid (:nickname ?data)))
 
-(defmethod -message-handler :webrtclient/login
-  [{:keys [uid ?data]}]
-  (println ?data)
-  (println "STUB: Hook up login to a database.")
-  (broadcast-new-user uid (:nickname ?data)))
-
-(defmethod -message-handler :webrtclient/register
-  [{:keys [uid ?data ?reply-fn]}]
-  ;; Reply back to the caller with the result of the insert.
-  (?reply-fn
-   (if (< (count  (:password ?data)) 7)
-     "Password too short."
-     (if (not (re-matches #".+@.+" (:email ?data)))
-       "Invalid email adress."
-       (accounts/update-user! uid ?data)))))
 
 
 ;;; Application specific WebRTC routes
 (defmethod -message-handler :leif-comm/offer
   [{:keys [uid event ?data]}]
   (println "Server received an offer, processing ")
-  (channel-send!  (:receiver ?data)
+  (send!  (:receiver ?data)
                   [:leif-comm/offer {:sender uid :offer (:offer ?data) :nickname (:nickname ?data)}]))
 
 (defmethod -message-handler :leif-comm/answer
   [{:keys [uid event ?data]}]
   (println "Server received an answer, processing ")
-  (channel-send!  (:receiver ?data)
+  (send!  (:receiver ?data)
                   [:leif-comm/answer {:sender uid :answer (:answer ?data)}]))
 
 (defmethod -message-handler :leif-comm/candidate
   [{:keys [uid event ?data]}]
   (println "Server received an candidate, processing ")
-  (channel-send!  (:receiver ?data)
+  (send!  (:receiver ?data)
                   [:leif-comm/candidate {:sender uid :candidate (:candidate ?data)}]))
 
 (defmethod -message-handler :leif-comm.server-comms/send-message

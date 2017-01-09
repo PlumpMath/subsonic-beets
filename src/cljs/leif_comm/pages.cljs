@@ -20,7 +20,7 @@
 
 
 (defn home []
-  [:div [:h2 "Welcome to WebRTClojure!"]
+  [:div [:h2 "Welcome to LEIF-comm!"]
    [:div [:a {:href "/about"} "About"]]
    [:div [:a {:href "/register"} "Register"]]
    [atom-field state/name-atom "Nickname" "text"]

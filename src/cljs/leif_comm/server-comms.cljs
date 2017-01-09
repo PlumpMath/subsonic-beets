@@ -37,7 +37,7 @@
 
 (defmethod -message-handler :default ; Unhandled message.
   [{:as ev-msg :keys [event]}]
-  (.error js/console "Unhandled event: %s" event))
+  (println "Unhandled event: %s" event))
 
 (defmethod -message-handler :chsk/state
   ;; Indicates when Sente is ready client-side.
