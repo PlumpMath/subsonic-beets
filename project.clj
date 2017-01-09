@@ -30,7 +30,7 @@
    [reagent-utils "0.1.7"]
    [secretary "1.2.3"]                 ; Client side routing.
    [venantius/accountant "0.1.7"]      ; Managing the URL bar in the browser.
-   [com.taoensso/sente "1.8.1"]        ; WebSockets manager.
+   [com.taoensso/sente "1.11.0"]        ; WebSockets manager.
 
    [cljs-ajax "0.5.4"]                 ; Testing purposes only.
    ]
@@ -72,14 +72,18 @@
                                         :optimizations :none
                                         :pretty-print  true}}}}
 
+  :figwheel {:http-server-root "public"
+             :server-port 3449
+             :nrepl-port 7002
+             :css-dirs ["resources/public/css"]
+             :ring-handler leif-comm.handler/app
+             :nrepl-middleware ["cider.nrepl/cider-middleware"
+                                "cemerick.piggieback/wrap-cljs-repl"]}
 
-  :profiles {:dev {:repl-options {:init-ns leif-comm.repl
-                                  :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
-
-                   :dependencies [[ring/ring-mock "0.3.0"]
+  :profiles {:dev {:dependencies [[ring/ring-mock "0.3.0"]
                                   [ring/ring-devel "1.4.0"]
                                   [prone "1.1.1"]
-                                  [lein-figwheel "0.5.2"
+                                  [lein-figwheel "0.5.8"
                                    :exclusions [org.clojure/core.memoize
                                                 ring/ring-core
                                                 org.clojure/clojure
@@ -91,12 +95,13 @@
                                                 org.clojure/tools.analyzer.jvm]]
                                   [org.clojure/tools.nrepl "0.2.12"]
                                   [com.cemerick/piggieback "0.2.1"]
-                                  [figwheel-sidecar "0.5.3-1"]
-                                  [pjstadig/humane-test-output "0.8.0"]
-                                  ]
+                                  [figwheel-sidecar "0.5.8"]
+                                  [cider/cider-nrepl "0.14.0"]
+                                  [pjstadig/humane-test-output "0.8.0"]]
 
                    :source-paths ["env/dev/clj"]
-                   :plugins [[lein-figwheel "0.5.2"
+
+                   :plugins [[lein-figwheel "0.5.8"
                               :exclusions [org.clojure/core.memoize
                                            ring/ring-core
                                            org.clojure/clojure
@@ -105,19 +110,10 @@
                                            org.clojure/tools.reader
                                            org.clojure/clojurescript
                                            org.clojure/core.async
-                                           org.clojure/tools.analyzer.jvm]]
-                             ]
+                                           org.clojure/tools.analyzer.jvm]]]
 
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
-
-                   :figwheel {:http-server-root "public"
-                              :server-port 3449
-                              :nrepl-port 7002
-                              :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"
-                                                 ]
-                              :css-dirs ["resources/public/css"]
-                              :ring-handler leif-comm.handler/app}
 
                    :env {:dev true}
 
@@ -125,12 +121,7 @@
                                               :compiler
                                               {:main "leif-comm.dev"
                                                :optimizations :none
-                                               :source-map true}}
-
-
-
-                                        }
-                               }}
+                                               :source-map true}}}}}
 
              :uberjar {:hooks [minify-assets.plugin/hooks]
                        :source-paths ["env/prod/clj"]
