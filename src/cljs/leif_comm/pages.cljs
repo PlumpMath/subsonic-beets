@@ -1,9 +1,9 @@
-(ns webrtclojure.pages
+(ns leif-comm.pages
   (:require [reagent.core :as reagent :refer [atom]]
             [accountant.core :as accountant]
-            [webrtclojure.state :as state]
-            [webrtclojure.webrtc :as webrtc]
-            [webrtclojure.server-comms :as server-comms]))
+            [leif-comm.state :as state]
+            [leif-comm.webrtc :as webrtc]
+            [leif-comm.server-comms :as server-comms]))
 
 
 (defn atom-field [value placeholder type]
@@ -29,7 +29,7 @@
               (accountant/navigate! "/chat"))}]])
 
 (defn about []
-  [:div [:h2 "About webrtclojure"]
+  [:div [:h2 "About leif-comm"]
    [:div [:a {:href "/"} "Go to the home page"]]])
 
 (defn registry []

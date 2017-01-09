@@ -1,4 +1,4 @@
-(ns webrtclojure.templates
+(ns leif-comm.templates
   (:require [hiccup.page :refer [include-js include-css html5]]
             [config.core :refer [env]]))
 

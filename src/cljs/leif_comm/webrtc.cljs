@@ -1,5 +1,5 @@
-(ns webrtclojure.webrtc
-  (:require [webrtclojure.state :as state]))
+(ns leif-comm.webrtc
+  (:require [leif-comm.state :as state]))
 
 ;;; ------------------------
 ;;; WebRTC connection handler
@@ -72,7 +72,7 @@
   (fn [event]
     (print "New ICE candida.")
     (if (and (not(nil? event)) (not(nil? (aget event "candidate"))))
-      (send-fn [:webrtclojure/candidate
+      (send-fn [:leif-comm/candidate
                 { :receiver sender
                  :candidate (.stringify js/JSON (aget event "candidate"))}] 8000))))
 
@@ -98,7 +98,7 @@
     (.setLocalDescription pc answer
                           #(print "Successfully added local description.")
                           print)
-    (send-fn [:webrtclojure/answer  { :receiver sender
+    (send-fn [:leif-comm/answer  { :receiver sender
                                      :answer    (.stringify js/JSON answer)}] 8000)))
 
 
@@ -131,7 +131,7 @@
     (.setLocalDescription pc offer
                           #(print "Successfully added local description.")
                           print)
-    (send-fn [:webrtclojure/offer { :receiver  sender
+    (send-fn [:leif-comm/offer { :receiver  sender
                                     :offer     (.stringify js/JSON offer)
                                     :nickname  @state/name-atom}] 8000)))
 

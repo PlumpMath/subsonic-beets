@@ -1,10 +1,10 @@
-(ns webrtclojure.accounts
-  (:require [webrtclojure.database :as db :refer [safely]]
+(ns leif-comm.accounts
+  (:require [leif-comm.database :as db :refer [safely]]
             [korma.core :refer :all :rename {update sql-update}]
             [buddy.core.nonce :as nonce]
             [buddy.hashers :as hashers]
             [buddy.core.codecs :as codecs]
-            [webrtclojure.util :as util]))
+            [leif-comm.util :as util]))
 
 
 ;;; --------------------

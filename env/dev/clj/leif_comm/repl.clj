@@ -1,5 +1,5 @@
-(ns webrtclojure.repl
-  (:use webrtclojure.handler
+(ns leif-comm.repl
+  (:use leif-comm.handler
         ring.server.standalone
         [ring.middleware file-info file]))
 

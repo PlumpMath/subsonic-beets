@@ -1,5 +1,5 @@
-(ns webrtclojure.prod
-  (:require [webrtclojure.core :as core]))
+(ns leif-comm.prod
+  (:require [leif-comm.core :as core]))
 
 ;;ignore println statements in prod
 (set! *print-fn* (fn [& _]))

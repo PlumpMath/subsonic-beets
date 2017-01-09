@@ -1,4 +1,4 @@
-(ns webrtclojure.state
+(ns leif-comm.state
   (:require [reagent.core :as reagent :refer [atom]]))
 
 

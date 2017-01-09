@@ -1,7 +1,7 @@
-(ns webrtclojure.server-comms
+(ns leif-comm.server-comms
   (:require [taoensso.sente      :as sente]
             [ajax.core :refer [GET POST]] ; Only for testing
-            [webrtclojure.webrtc :as webrtc]
+            [leif-comm.webrtc :as webrtc]
             [reagent.core :as reagent :refer [atom]]))
 
 
@@ -54,19 +54,19 @@
 
 ;;; Application specific routes
 
-(defmethod -message-handler :webrtclojure/new-user
+(defmethod -message-handler :leif-comm/new-user
   [{:as ev-msg :keys [event uid ?data]}]
   (webrtc/process-new-user! channel-send! (:user ?data) (:nickname ?data)))
 
-(defmethod -message-handler :webrtclojure/offer
+(defmethod -message-handler :leif-comm/offer
   [{:as ev-msg :keys [event uid ?data]}]
   (webrtc/process-offer! channel-send! (:sender ?data) (:nickname ?data) (.parse js/JSON (:offer ?data))))
 
-(defmethod -message-handler :webrtclojure/answer
+(defmethod -message-handler :leif-comm/answer
   [{:as ev-msg :keys [event uid ?data]}]
   (webrtc/process-answer! channel-send! (:sender ?data) (.parse js/JSON (:answer ?data))))
 
-(defmethod -message-handler :webrtclojure/candidate
+(defmethod -message-handler :leif-comm/candidate
   [{:as ev-msg :keys [event uid ?data]}]
   (webrtc/process-candidate! channel-send! (:sender ?data) (.parse js/JSON (:candidate ?data))))
 

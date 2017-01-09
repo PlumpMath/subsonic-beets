@@ -1,10 +1,10 @@
-(ns webrtclojure.handler
+(ns leif-comm.handler
   (:require [compojure.core            :refer [GET POST defroutes]]
             [compojure.route           :refer [not-found resources]]
-            [webrtclojure.middleware   :refer [wrap-middleware]]
-            [webrtclojure.templates    :refer [loading-page]]
-            [webrtclojure.broadcasting :refer [start-broadcaster! broadcast!]]
-            [webrtclojure.sente-routes     :as sente-routes]
+            [leif-comm.middleware   :refer [wrap-middleware]]
+            [leif-comm.templates    :refer [loading-page]]
+            [leif-comm.broadcasting :refer [start-broadcaster! broadcast!]]
+            [leif-comm.sente-routes     :as sente-routes]
             [config.core               :refer [env]]))
 
 

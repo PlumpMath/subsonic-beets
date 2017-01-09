@@ -1,11 +1,11 @@
-(ns webrtclojure.database
+(ns leif-comm.database
   (:require
    [korma.core :refer [defentity entity-fields table has-many]]
    [korma.db   :refer [defdb postgres default-connection]]
    [ragtime.jdbc :as jdbc]
    [ragtime.repl :as repl]
    [heroku-database-url-to-jdbc.core :as htj]
-   [webrtclojure.util :as util])
+   [leif-comm.util :as util])
   (import org.postgresql.util.PSQLException)
   (import java.sql.BatchUpdateException))
 
@@ -41,11 +41,11 @@
 ;;; --------------------
 ;;; Setup
 
-;; Either use environment variable or default to current_user@localhost/webrtclojure.
+;; Either use environment variable or default to current_user@localhost/leif-comm.
 ;; You may need to trust all connections from 127.0.0.1 in /etc/postgresql/9.5/main/pg_hba.conf.
 (def db-uri
   (java.net.URI. (or (System/getenv "DATABASE_URL")
-                     (clojure.core/format "postgresql://%s@localhost:5432/webrtclojure"
+                     (clojure.core/format "postgresql://%s@localhost:5432/leif-comm"
                                           (System/getenv "USER")))))
 
 ;; Also sets this db as the default db for future korma calls.

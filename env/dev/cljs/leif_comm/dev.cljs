@@ -1,5 +1,5 @@
-(ns ^:figwheel-no-load webrtclojure.dev
-  (:require [webrtclojure.core :as core]
+(ns ^:figwheel-no-load leif-comm.dev
+  (:require [leif-comm.core :as core]
             [figwheel.client :as figwheel :include-macros true]))
 
 (enable-console-print!)

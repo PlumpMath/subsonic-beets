@@ -1,4 +1,4 @@
-(ns webrtclojure.middleware
+(ns leif-comm.middleware
   (:require [ring.middleware.defaults :refer [site-defaults wrap-defaults]]))
 
 (defn wrap-middleware [handler]

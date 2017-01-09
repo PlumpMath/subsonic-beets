@@ -1,13 +1,13 @@
-(ns webrtclojure.core
+(ns leif-comm.core
     (:require [reagent.core :as reagent :refer [atom]]
               [reagent.session :as session]
               [secretary.core :as secretary]
               [accountant.core :as accountant]
               [taoensso.sente  :as sente]
               [ajax.core :refer [GET POST]] ; Only for testing
-              [webrtclojure.server-comms :as server-comms]
-              [webrtclojure.webrtc :as webrtc]
-              [webrtclojure.pages :as pages]))
+              [leif-comm.server-comms :as server-comms]
+              [leif-comm.webrtc :as webrtc]
+              [leif-comm.pages :as pages]))
 
 ;;; -------------------------
 ;;; State

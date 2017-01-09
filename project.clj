@@ -1,6 +1,6 @@
-(defproject webrtclojure "0.1.0"
+(defproject leif-comm "0.1.0"
   :description "Real time JSON data communication between browsers."
-  :url "https://github.com/Rovanion/WebRTClojure"
+  :url "https://github.com/Rovanion/leif-comm"
   :license {:name "AGPLv3"
             :url "http://www.gnu.org/licenses/agpl-3.0.html"}
 
@@ -40,14 +40,14 @@
             [lein-asset-minifier "0.2.7"
              :exclusions [org.clojure/clojure]]]
 
-  :ring {:handler      webrtclojure.handler/app
-         :uberwar-name "webrtclojure.war"}
+  :ring {:handler      leif-comm.handler/app
+         :uberwar-name "leif-comm.war"}
 
   :min-lein-version "2.5.0"
 
-  :uberjar-name "webrtclojure.jar"
+  :uberjar-name "leif-comm.jar"
 
-  :main webrtclojure.server
+  :main leif-comm.server
 
   :clean-targets ^{:protect false}
   [:target-path
@@ -58,8 +58,8 @@
   :test-paths ["test/clj" "test/cljc"]
   :resource-paths ["resources" "target/cljsbuild"]
 
-  :aliases {"migrate"  ["run" "-m" "webrtclojure.database/migrate"]
-            "rollback" ["run" "-m" "webrtclojure.database/rollback"]}
+  :aliases {"migrate"  ["run" "-m" "leif-comm.database/migrate"]
+            "rollback" ["run" "-m" "leif-comm.database/rollback"]}
 
   :minify-assets
   {:assets
@@ -73,7 +73,7 @@
                                         :pretty-print  true}}}}
 
 
-  :profiles {:dev {:repl-options {:init-ns webrtclojure.repl
+  :profiles {:dev {:repl-options {:init-ns leif-comm.repl
                                   :nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
 
                    :dependencies [[ring/ring-mock "0.3.0"]
@@ -117,13 +117,13 @@
                               :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"
                                                  ]
                               :css-dirs ["resources/public/css"]
-                              :ring-handler webrtclojure.handler/app}
+                              :ring-handler leif-comm.handler/app}
 
                    :env {:dev true}
 
                    :cljsbuild {:builds {:app {:source-paths ["env/dev/cljs"]
                                               :compiler
-                                              {:main "webrtclojure.dev"
+                                              {:main "leif-comm.dev"
                                                :optimizations :none
                                                :source-map true}}
 

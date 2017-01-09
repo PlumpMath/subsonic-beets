@@ -1,6 +1,6 @@
-(ns webrtclojure.broadcasting
+(ns leif-comm.broadcasting
   (:require [clojure.core.async :refer [<! go-loop timeout]]
-            [webrtclojure.sente-routes :refer [channel-send!]]))
+            [leif-comm.sente-routes :refer [channel-send!]]))
 
 (defn broadcast! "Send a broadcast to all users" [func data uids]
   (println "Broadcast to func: " func "\n")
@@ -11,5 +11,5 @@
 (defn start-broadcaster! "Broadcast some data to all clients." [uids send!]
     (go-loop [i 0]
       (<! (timeout 10000))
-      (broadcast! :webrtclojure/broadcast i uids)
+      (broadcast! :leif-comm/broadcast i uids)
       (recur (inc i))))

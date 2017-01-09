@@ -1,8 +1,8 @@
-(ns webrtclojure.sente-routes
+(ns leif-comm.sente-routes
   (:require [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit
              :refer [sente-web-server-adapter]]
-            [webrtclojure.accounts :as accounts]))
+            [leif-comm.accounts :as accounts]))
 
 ;;; -------------------------
 ;;; Setup
@@ -34,7 +34,7 @@
 (defn broadcast-new-user
   [uid nickname]
   "Broadcast the newly connected user"
-  (broadcast :webrtclojure/new-user {:user uid :nickname nickname} uid))
+  (broadcast :leif-comm/new-user {:user uid :nickname nickname} uid))
 
 ;;; -------------------------
 ;;; Routes
@@ -87,23 +87,23 @@
 
 
 ;;; Application specific WebRTC routes
-(defmethod -message-handler :webrtclojure/offer
+(defmethod -message-handler :leif-comm/offer
   [{:keys [uid event ?data]}]
   (println "Server received an offer, processing ")
   (channel-send!  (:receiver ?data)
-                  [:webrtclojure/offer {:sender uid :offer (:offer ?data) :nickname (:nickname ?data)}]))
+                  [:leif-comm/offer {:sender uid :offer (:offer ?data) :nickname (:nickname ?data)}]))
 
-(defmethod -message-handler :webrtclojure/answer
+(defmethod -message-handler :leif-comm/answer
   [{:keys [uid event ?data]}]
   (println "Server received an answer, processing ")
   (channel-send!  (:receiver ?data)
-                  [:webrtclojure/answer {:sender uid :answer (:answer ?data)}]))
+                  [:leif-comm/answer {:sender uid :answer (:answer ?data)}]))
 
-(defmethod -message-handler :webrtclojure/candidate
+(defmethod -message-handler :leif-comm/candidate
   [{:keys [uid event ?data]}]
   (println "Server received an candidate, processing ")
   (channel-send!  (:receiver ?data)
-                  [:webrtclojure/candidate {:sender uid :candidate (:candidate ?data)}]))
+                  [:leif-comm/candidate {:sender uid :candidate (:candidate ?data)}]))
 
 ;;; -------------------------
 ;;; Router lifecycle.
