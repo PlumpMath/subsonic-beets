@@ -53,15 +53,9 @@
    {"resources/public/css/site.min.css" "resources/public/css/site.css"}}
 
   :cljsbuild {:builds {:app {:source-paths ["src/cljs" "src/cljc"]
-                             :compiler {:output-to "target/cljsbuild/public/js/app.js"
+                             :compiler {:output-to  "target/cljsbuild/public/js/app.js"
                                         :output-dir "target/cljsbuild/public/js/out"
-                                        :asset-path   "/js/out"
-                                        :optimizations :none
-                                        :pretty-print  true
-                                        :preloads [devtools.preload]
-                                        :external-config {:devtools/config
-                                                          {:features-to-install
-                                                           [:formatters :hints :async]}}}}}}
+                                        :asset-path "/js/out"}}}}
 
   :figwheel {:http-server-root "public"
              :server-port 3449
@@ -71,35 +65,29 @@
              :nrepl-middleware ["cider.nrepl/cider-middleware"
                                 "cemerick.piggieback/wrap-cljs-repl"]}
 
-  :profiles {:dev {:dependencies [[ring/ring-mock "0.3.0"]
-                                  [ring/ring-devel "1.4.0"]
-                                  [prone "1.1.1"]
-                                  [lein-figwheel "0.5.8"]
-                                  [org.clojure/tools.nrepl "0.2.12"]
-                                  [com.cemerick/piggieback "0.2.1"]
-                                  [figwheel-sidecar "0.5.8"]
-                                  [cider/cider-nrepl "0.14.0"]
-                                  [binaryage/devtools "0.8.3"]
-                                  [pjstadig/humane-test-output "0.8.0"]]
+  :profiles {:dev {:dependencies [[ring/ring-mock              "0.3.0"]
+                                  [ring/ring-devel             "1.4.0"]
+                                  [prone                       "1.1.1"]
+                                  [lein-figwheel               "0.5.8"]
+                                  [org.clojure/tools.nrepl     "0.2.12"]
+                                  [com.cemerick/piggieback     "0.2.1"]
+                                  [figwheel-sidecar            "0.5.8"]
+                                  [cider/cider-nrepl           "0.14.0"]
+                                  [binaryage/devtools          "0.8.3"]]
 
                    :source-paths ["env/dev/clj"]
 
                    :plugins [[lein-figwheel "0.5.8"]]
 
-                   :injections [(require 'pjstadig.humane-test-output)
-                                (pjstadig.humane-test-output/activate!)]
-
                    :env {:dev true}
 
                    :cljsbuild {:builds {:app {:source-paths ["env/dev/cljs"]
                                               :compiler
-                                              {:main "leif-comm.dev"
-                                               :optimizations :none
-                                               :source-map true
-                                               :preloads [devtools.preload]
-                                               :external-config {:devtools/config
-                                                                 {:features-to-install
-                                                                  [:formatters :hints :async]}}}}}}}
+                                              {:main            "leif-comm.dev"
+                                               :optimizations   :none
+                                               :source-map      true
+                                               :pretty-print    true
+                                               :preloads        [devtools.preload]}}}}}
 
              :uberjar {:hooks [minify-assets.plugin/hooks]
                        :source-paths ["env/prod/clj"]
@@ -111,5 +99,6 @@
                                    :builds {:app
                                             {:source-paths ["env/prod/cljs"]
                                              :compiler
-                                             {:optimizations :advanced
-                                              :pretty-print false}}}}}})
+                                             {:main          "leif-comm.prod"
+                                              :optimizations :advanced
+                                              :pretty-print  false}}}}}})
