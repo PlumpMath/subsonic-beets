@@ -1,6 +1,5 @@
 (ns leif-comm.server-comms
   (:require [taoensso.sente      :as sente]
-            [ajax.core :refer [GET POST]] ; Only for testing
             [leif-comm.state :as state]
             [reagent.core :as reagent :refer [atom]]))
 
@@ -37,13 +36,13 @@
   ;; Indicates when Sente is ready client-side.
   [{:keys [?data]}]
   (if (= ?data {:first-open? true})
-    (print "Channel socket opened: %s" (clj->js ?data))))
+    (println "Channel socket opened: %s" (clj->js ?data))))
 
 (defmethod -message-handler :chsk/handshake
   ;; Handshake for WS
   [{:keys [?data]}]
   (let [[uid csrf-token] ?data]
-    (print "Handshake gotten with uid:" uid "and csrf:" csrf-token)))
+    (println "Handshake gotten with uid:" uid "and csrf:" csrf-token)))
 
 
 ;;; -------------------------

@@ -32,18 +32,19 @@ html, div#app {
 }
 
 body {
-	margin: 2em 1em 0 1em;
-	height: calc(100% - 3em);
-}
-
-
-body {
 	font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
-	-webkit-font-smoothing: antialiased;
 	color: #333;
 	line-height: 1.5em;
+	margin: 0;
+	height: 100%;
+	overflow: hidden;
+	box-sizing: border-box;
 }
-
+input, textarea {
+	font-family: 'Helvetica Neue', Verdana, Helvetica, Arial, sans-serif;
+	border-color: #ddd;
+	border-width: 1px;
+}
 h1, h2, h3 {
 	color: #000;
 }
@@ -66,6 +67,7 @@ h5 {
 a {
 	text-decoration: none;
 	color: #09f;
+	cursor: pointer;
 }
 
 a:hover {
@@ -79,32 +81,26 @@ input {
 
 
 div#chat {
+	display: flex;
+	flex-direction: column;
   height: 100%;
 }
 
-#send-btn {
-	background-color: #3498db;
-  border: none;
-  color: white;
-  font-size: 0.8em;
-  padding: 0.5em 0.7em 0.6em 0.7em;
-  width: 30%;
-	height: calc(20% + 6px);
-  float:right;
-}
-
-#send-btn:hover {
-  background-color: #3cb0fd;
+textarea {
+	resize: none;
 }
 
 textarea#received {
-	height: calc(75% - 4em);
-  width: calc(100% - 6px);
+	height: 100%;
+  width: 100%;
 	background-color: #fff;
 	overflow: hidden;
 }
 
-textarea#send {
-  height: 20%;
-	width: calc(70% - 8px);
+textarea#chat-input {
+	box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.2);
+	box-sizing: border-box;
+	width: 100%;
+	border: 0;
+
 }

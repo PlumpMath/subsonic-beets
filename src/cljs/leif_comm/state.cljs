@@ -8,7 +8,7 @@
 (defonce name-atom (atom ""))
 (defonce email-atom (atom ""))
 (defonce password-atom (atom ""))
-(defonce recvtextarea-atom (atom ""))
+(defonce chat-log (atom ""))
 (defonce sendtextarea-atom (atom ""))
 (defonce connected-peers-atom (atom {}))
 

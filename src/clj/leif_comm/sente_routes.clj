@@ -82,14 +82,15 @@
 
 (defmethod -message-handler :leif-comm.server-comms/send-message
   [{:keys [uid event ?data]}]
-  (println ?data)
-  (swap! state/messages conj ?data))
+  (swap! state/messages conj (assoc ?data :uid uid))
+  (println @state/messages))
 
 ;;; -------------------------
 ;;; Router lifecycle.
 
 (defonce router (atom nil))
-(defn  stop-router! [] (when-let [stop-f @router] (stop-f)))
+(defn stop-router!  []
+  (when-let [stop-f @router] (stop-f)))
 (defn start-router! []
   (stop-router!)
   (reset! router
