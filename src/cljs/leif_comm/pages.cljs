@@ -25,7 +25,8 @@
    [atom-field state/name-atom "Nickname" "text"]
    [:input {:type "button" :value "Start" :on-click
             #(do (server-comms/anonymous-login! @state/name-atom)
-              (accountant/navigate! "/chat"))}]])
+                 (accountant/navigate! "/chat"))}]])
+
 
 (defn send-chat!
   [message]

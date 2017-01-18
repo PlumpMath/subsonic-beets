@@ -59,31 +59,14 @@
 
 
 
-
-
-;;; Application specific WebRTC routes
-(defmethod -message-handler :leif-comm/offer
+;;; Application specific routes, the interesting stuff
+(defmethod -message-handler :leif-comm.server-comms/send-chat
   [{:keys [uid event ?data]}]
-  (println "Server received an offer, processing ")
-  (send!  (:receiver ?data)
-                  [:leif-comm/offer {:sender uid :offer (:offer ?data) :nickname (:nickname ?data)}]))
+  (let [messages (swap! state/messages
+                        #(conj % (assoc ?data :uid uid :position (count %))))
+        message (last messages)]
+    (println message)))
 
-(defmethod -message-handler :leif-comm/answer
-  [{:keys [uid event ?data]}]
-  (println "Server received an answer, processing ")
-  (send!  (:receiver ?data)
-                  [:leif-comm/answer {:sender uid :answer (:answer ?data)}]))
-
-(defmethod -message-handler :leif-comm/candidate
-  [{:keys [uid event ?data]}]
-  (println "Server received an candidate, processing ")
-  (send!  (:receiver ?data)
-                  [:leif-comm/candidate {:sender uid :candidate (:candidate ?data)}]))
-
-(defmethod -message-handler :leif-comm.server-comms/send-message
-  [{:keys [uid event ?data]}]
-  (swap! state/messages conj (assoc ?data :uid uid))
-  (println @state/messages))
 
 ;;; -------------------------
 ;;; Router lifecycle.

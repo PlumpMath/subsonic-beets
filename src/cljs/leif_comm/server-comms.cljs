@@ -60,14 +60,13 @@
 ;;; -------------------------
 ;;; Messages to the server
 
-(defn anonymous-login! "Log in as a returning anonymous user." [nickname]
+(defn anonymous-login!
+  "Log in as an anonymous user without username and password."
+  [nickname]
   (send! [:webrtclient/anonymous-login {:nickname nickname}])
   (.info js/console "Sending anonymous login for" nickname))
-
-(defn login! "Login to the server." [email password]
-  (send! [:webrtclient/login {:email email :password password}]))
 
 (defn send-message!
   "Send a message to the chat room"
   [text]
-  (send! [::send-message {:text text :author @state/name-atom}]))
+  (send! [::send-chat {:text text :author @state/name-atom}]))

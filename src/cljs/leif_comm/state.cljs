@@ -5,7 +5,7 @@
 ;;; -------------------------
 ;;; Application state
 
-(defonce name-atom (atom ""))
+(defonce name-atom (atom "Anonymous"))
 (defonce email-atom (atom ""))
 (defonce password-atom (atom ""))
 (defonce chat-log (atom ""))
