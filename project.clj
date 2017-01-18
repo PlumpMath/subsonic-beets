@@ -10,13 +10,13 @@
    [org.clojure/core.cache "0.6.4"]    ; Version requiered by figwheel.
 
    [ring-server "0.4.0"]               ; Library for starting a web server.
-   [ring/ring-core "1.4.0"]            ; HTTP abstraction library.
-   [ring/ring-defaults "0.2.0"]        ; Middleware collection.
+   [ring/ring-core "1.5.1"]            ; HTTP abstraction library.
+   [ring/ring-defaults "0.2.1"]        ; Middleware collection.
    [yogthos/config "0.8"]              ; Managing environment configs.
-   [compojure "1.5.0"]                 ; Routing.
-   [http-kit "2.1.19"]                 ; Our web server.
+   [compojure "1.5.2"]                 ; Routing.
+   [http-kit "2.2.0"]                 ; Our web server.
 
-   [org.clojure/clojurescript "1.8.51" :scope "provided"]
+   [org.clojure/clojurescript "1.9.293"]
    [reagent "0.5.1"                    ; React abstraction.
     :exclusions [org.clojure/tools.reader]]
    [reagent-forms "0.5.22"]
