@@ -34,21 +34,6 @@
   (reset! state/sendtextarea-atom ""))
 
 
-(def chat-state (atom ""))
-
-(defn chat-input []
-  (let [written-text (atom "")]
-    (fn []
-      [:textarea
-       {:value        @written-text
-        :on-change    #(reset! written-text (-> % .-target .-value))
-        :on-key-press (fn [e]
-                        (let [enter 13]
-                          (println "key press" (.-charCode e))
-                          (if (= (.-charCode e) enter)
-                            (reset! written-text "")
-                            (println "Not enter."))))}])))
-
 (defn update-rows
   [row-count-atom max-rows dom-node value]
   (let [field-height   (.-clientHeight dom-node)
@@ -62,13 +47,12 @@
       (empty? value)
       (reset! row-count-atom 1))))
 
-(def ENTER_KEY 13)
-
 (defn expanding-textarea
   "a textarea which expands up to max-rows as it's content expands"
   [{:keys [value-fn max-rows on-return-fn] :as opts}]
-  (let [dom-node  (atom nil)
-        row-count (atom 1)]
+  (let [dom-node      (atom nil)
+        row-count     (atom 1)
+        enter-keycode 13]
     (reagent/create-class
      {:display-name "expanding-textarea"
 
@@ -92,7 +76,7 @@
                                 (on-change-fn (-> e .-target .-value)))
                    :on-key-down (fn [e]
                                   (let [key-code  (.-keyCode e)]
-                                    (when (and (= ENTER_KEY key-code)
+                                    (when (and (= enter-keycode key-code)
                                                (not (.-shiftKey e))
                                                (not (.-altKey e))
                                                (not (.-ctrlKey e))
@@ -109,6 +93,7 @@
    [expanding-textarea {:id :chat-input
                         :value-fn     (fn [] @state/sendtextarea-atom)
                         :on-change-fn (fn [arg] (reset! state/sendtextarea-atom arg))
-                        :max-rows     5
-                        :on-return-fn (fn [] (send-chat! @state/sendtextarea-atom)
+                        :max-rows     7
+                        :on-return-fn (fn []
+                                        (send-chat! @state/sendtextarea-atom)
                                         (reset! state/sendtextarea-atom ""))}]])

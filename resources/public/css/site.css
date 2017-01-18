@@ -102,5 +102,5 @@ textarea#chat-input {
 	box-sizing: border-box;
 	width: 100%;
 	border: 0;
-
+	min-height: 1.5em;
 }
