@@ -39,11 +39,17 @@
     (println "Channel socket opened: %s" (clj->js ?data))))
 
 (defmethod -message-handler :chsk/handshake
-  ;; Handshake for WS
+  ;; Handshake for WebSocket or long-poll.
   [{:keys [?data]}]
   (let [[uid csrf-token] ?data]
     (println "Handshake gotten with uid:" uid "and csrf:" csrf-token)))
 
+
+;;; Application specific routes
+
+(defmethod -message-handler :leif-comm.sente-routes/new-message
+  [{:keys [?data]}]
+  (state/append! state/chat-log (:author ?data) (:text ?data)))
 
 ;;; -------------------------
 ;;; Router lifecycle.

@@ -19,7 +19,8 @@
   (def connected-uids                connected-uids))
 
 ;;; -------------------------
-;;; General
+;;; Application specific functions
+
 (defn broadcast
   "Send a broadcast to all users except caller"
   [func data caller]
@@ -30,7 +31,11 @@
 (defn broadcast-new-user
   [uid nickname]
   "Broadcast the newly connected user"
-  (broadcast :leif-comm/new-user {:user uid :nickname nickname} uid))
+  (broadcast ::new-user {:user uid :nickname nickname} uid))
+
+(defn broadcast-message
+  [message]
+  (broadcast ::new-message message (:uid message)))
 
 ;;; -------------------------
 ;;; Routes
@@ -47,7 +52,7 @@
 ;; Unhandled message.
 (defmethod -message-handler :default
   [{:as ev-msg :keys [event]}]
-  (println "Unhandled event: %s" event))
+  (println "Unhandled event: " event))
 
 ;; Triggers when a particular user connects and wasn't previously connected .
 (defmethod -message-handler :chsk/uidport-open
@@ -65,7 +70,8 @@
   (let [messages (swap! state/messages
                         #(conj % (assoc ?data :uid uid :position (count %))))
         message (last messages)]
-    (println message)))
+    (println message)
+    (broadcast-message message)))
 
 
 ;;; -------------------------

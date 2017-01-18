@@ -3,6 +3,5 @@
             [figwheel.client :as figwheel :include-macros true]))
 
 (enable-console-print!)
-(println "We're actually running this file")
 
 (core/init!)
