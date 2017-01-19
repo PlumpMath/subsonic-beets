@@ -50,9 +50,10 @@
 
 (defn expanding-textarea
   "a textarea which expands up to max-rows as it's content expands"
-  [{:keys [value-fn max-rows on-return-fn] :as opts}]
+  [{:keys [max-rows] :as opts}]
   (let [dom-node      (atom nil)
         row-count     (atom 1)
+        written-text  (atom "")
         enter-keycode 13]
     (reagent/create-class
      {:display-name "expanding-textarea"
@@ -60,41 +61,37 @@
       :component-did-mount
       (fn [ref]
         (reset! dom-node (reagent/dom-node ref))
-        (update-rows row-count max-rows @dom-node (value-fn)))
+        (update-rows row-count max-rows @dom-node @written-text))
 
       :component-did-update
       (fn []
-        (update-rows row-count max-rows @dom-node (value-fn)))
+        (update-rows row-count max-rows @dom-node @written-text))
 
       :reagent-render
-      (fn [{:keys [on-change-fn] :as opts}]
-        (let [opts (dissoc opts :initial-value :max-rows :on-change-fn)]
+      (fn [opts]
+        (let [opts (dissoc opts :max-rows)]
           [:textarea
            (merge opts
                   {:rows  @row-count
-                   :value (value-fn)
+                   :value @written-text
                    :on-change (fn [e]
-                                (on-change-fn (-> e .-target .-value)))
+                                (reset! written-text (-> e .-target .-value)))
                    :on-key-down (fn [e]
                                   (let [key-code  (.-keyCode e)]
                                     (when (and (= enter-keycode key-code)
                                                (not (.-shiftKey e))
                                                (not (.-altKey e))
                                                (not (.-ctrlKey e))
-                                               (not (.-metaKey e))
-                                               (fn? on-return-fn))
-                                          (do
-                                            (.preventDefault e)
-                                            (on-return-fn)))))})]))})))
+                                               (not (.-metaKey e)))
+                                      (do
+                                        (.preventDefault e)
+                                        (send-chat! @written-text)
+                                        (reset! written-text "")))))})]))})))
 
 (defn chat []
   [:div {:id :chat}
    [:a {:href "/"} "< Back"]
    [atom-textarea :received state/chat-log {:disabled true}]
-   [expanding-textarea {:id :chat-input
-                        :value-fn     (fn [] @state/sendtextarea-atom)
-                        :on-change-fn (fn [arg] (reset! state/sendtextarea-atom arg))
-                        :max-rows     7
-                        :on-return-fn (fn []
-                                        (send-chat! @state/sendtextarea-atom)
-                                        (reset! state/sendtextarea-atom ""))}]])
+   [expanding-textarea {:id "chat-input"
+                        :max-rows   7
+                        :auto-focus false}]])

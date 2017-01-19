@@ -17,7 +17,7 @@
    [http-kit "2.2.0"]                 ; Our web server.
 
    [org.clojure/clojurescript "1.9.293"]
-   [reagent "0.5.1"                    ; React abstraction.
+   [reagent "0.6.0"                    ; React abstraction.
     :exclusions [org.clojure/tools.reader]]
    [reagent-forms "0.5.22"]
    [reagent-utils "0.1.7"]
