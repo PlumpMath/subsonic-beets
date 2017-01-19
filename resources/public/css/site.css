@@ -96,6 +96,7 @@ ul#received {
 	background-color: #fff;
 	overflow-y: scroll;
 	overflow-x: hidden;
+	scroll-behaviour: smooth;
 }
 
 textarea#chat-input {

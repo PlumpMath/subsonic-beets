@@ -86,17 +86,35 @@
                                         (send-chat! @written-text)
                                         (reset! written-text "")))))})]))})))
 
+
 (defn chat-log-entry
   [{:keys [message-id author text] :as data}]
-  (println data)
   [:p (str author ": " text)])
+
+(defn scroll-to-bottom
+  "Scroll the given dom-node to the bottom."
+  [dom-node]
+  (let [last-child-index (- (.-childElementCount dom-node) 1)
+        last-child    (aget (.-childNodes dom-node) last-child-index)]
+    (.scrollIntoView dom-node (clj->js {:behavior "smooth"}))))
+
+(defn chat-log
+  []
+  (let [dom-node-atom (atom nil)]
+    (reagent/create-class
+     {:display-name "chat-log"
+      :component-did-mount  #(reset! dom-node-atom (reagent/dom-node %))
+      :component-did-update #(scroll-to-bottom @dom-node-atom)
+      :reagent-render
+      (fn [opts]
+        [:ul {:id "received"}
+         (for [c @state/chat-log]
+           ^{:key (:message-id c)} [chat-log-entry c])])})))
 
 (defn chat []
   [:div {:id :chat}
    [:a {:href "/"} "< Back"]
-   [:ul {:id "received"}
-    (for [c @state/chat-log]
-      ^{:key (:message-id c)} [chat-log-entry c])]
+   [chat-log]
    [expanding-textarea {:id "chat-input"
                         :max-rows   7
                         :auto-focus false}]])
