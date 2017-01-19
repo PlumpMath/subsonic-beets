@@ -8,12 +8,4 @@
 (defonce name-atom (atom "Anonymous"))
 (defonce email-atom (atom ""))
 (defonce password-atom (atom ""))
-(defonce chat-log (atom ""))
-(defonce sendtextarea-atom (atom ""))
-(defonce connected-peers-atom (atom {}))
-
-;;; -------------------------
-;;; Helper functions
-
-(defn append! [atom user message]
-  (swap! atom str (str user ": " message "\n")))
+(defonce chat-log (atom []))

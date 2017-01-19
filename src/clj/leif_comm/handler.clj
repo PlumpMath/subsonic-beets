@@ -21,7 +21,7 @@
         (broadcast! 9001 sente-routes/connected-uids)
         (broadcast! 9001 :sente/all-users-without-uid))
   (GET  "/reset-sente-router" []
-        sente-routes/start-router!)
+        sente-routes/restart-router!)
   ;; Static content
   (resources "/")
   (not-found "Not Found"))

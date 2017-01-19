@@ -49,7 +49,7 @@
 
 (defmethod -message-handler :leif-comm.sente-routes/new-message
   [{:keys [?data]}]
-  (state/append! state/chat-log (:author ?data) (:text ?data)))
+  (swap! state/chat-log conj ?data))
 
 ;;; -------------------------
 ;;; Router lifecycle.

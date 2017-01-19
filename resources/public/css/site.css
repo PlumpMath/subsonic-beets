@@ -90,11 +90,12 @@ textarea {
 	resize: none;
 }
 
-textarea#received {
+ul#received {
 	height: 100%;
   width: 100%;
 	background-color: #fff;
-	overflow: hidden;
+	overflow-y: scroll;
+	overflow-x: hidden;
 }
 
 textarea#chat-input {

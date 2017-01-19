@@ -21,21 +21,21 @@
 ;;; -------------------------
 ;;; Application specific functions
 
-(defn broadcast
-  "Send a broadcast to all users except caller"
-  [func data caller]
+(defn broadcast-to-all-but-one
+  "Send a broadcast to all users except the user who's the origin of the broadcast."
+  [identifier-kw data origin-uid]
   (doseq [uid (:any @connected-uids)]
-      (if (not= uid caller)
-        (send! uid [func data] 8000))))
+      (if (not= uid origin-uid)
+        (send! uid [identifier-kw data] 8000))))
 
-(defn broadcast-new-user
-  [uid nickname]
-  "Broadcast the newly connected user"
-  (broadcast ::new-user {:user uid :nickname nickname} uid))
+(defn broadcast
+  [identifier-kw data]
+  (doseq [uid (:any @connected-uids)]
+    (send! uid [identifier-kw data] 8000)))
 
 (defn broadcast-message
   [message]
-  (broadcast ::new-message message (:uid message)))
+  (broadcast ::new-message message))
 
 ;;; -------------------------
 ;;; Routes
@@ -68,7 +68,7 @@
 (defmethod -message-handler :leif-comm.server-comms/send-chat
   [{:keys [uid event ?data]}]
   (let [messages (swap! state/messages
-                        #(conj % (assoc ?data :uid uid :position (count %))))
+                        #(conj % (assoc ?data :uid uid :message-id (count %))))
         message (last messages)]
     (println message)
     (broadcast-message message)))
@@ -81,8 +81,9 @@
 (defn stop-router!  []
   (when-let [stop-f @router] (stop-f)))
 (defn start-router! []
+  (reset! router (sente/start-server-chsk-router! receive-channel message-handler)))
+(defn restart-router! [_]
   (stop-router!)
-  (reset! router
-          (sente/start-server-chsk-router! receive-channel message-handler)))
+  (start-router!))
 
 (defonce is-router-started? (start-router!))

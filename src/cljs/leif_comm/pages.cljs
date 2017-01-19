@@ -30,9 +30,7 @@
 
 (defn send-chat!
   [message]
-  (server-comms/send-message! message)
-  (state/append! state/chat-log @state/name-atom message)
-  (reset! state/sendtextarea-atom ""))
+  (server-comms/send-message! message))
 
 
 (defn update-rows
@@ -49,7 +47,7 @@
       (reset! row-count-atom 1))))
 
 (defn expanding-textarea
-  "a textarea which expands up to max-rows as it's content expands"
+  "A textarea which expands with the inputted text."
   [{:keys [max-rows] :as opts}]
   (let [dom-node      (atom nil)
         row-count     (atom 1)
@@ -88,10 +86,17 @@
                                         (send-chat! @written-text)
                                         (reset! written-text "")))))})]))})))
 
+(defn chat-log-entry
+  [{:keys [message-id author text] :as data}]
+  (println data)
+  [:p (str author ": " text)])
+
 (defn chat []
   [:div {:id :chat}
    [:a {:href "/"} "< Back"]
-   [atom-textarea :received state/chat-log {:disabled true}]
+   [:ul {:id "received"}
+    (for [c @state/chat-log]
+      ^{:key (:message-id c)} [chat-log-entry c])]
    [expanding-textarea {:id "chat-input"
                         :max-rows   7
                         :auto-focus false}]])
