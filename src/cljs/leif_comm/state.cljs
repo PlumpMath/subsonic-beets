@@ -8,4 +8,4 @@
 (defonce name-atom (atom "Anonymous"))
 (defonce email-atom (atom ""))
 (defonce password-atom (atom ""))
-(defonce chat-log (atom []))
+(defonce chat-log (atom {}))

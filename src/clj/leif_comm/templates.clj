@@ -4,7 +4,7 @@
 
 (def mount-target
   [:div#app
-   [:h5 "Connecting..."]])
+   [:h5 {:id "loading-message"} "Connecting..."]])
 
 (def loading-page
   (html5

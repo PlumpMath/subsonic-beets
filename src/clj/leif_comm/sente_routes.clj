@@ -33,9 +33,6 @@
   (doseq [uid (:any @connected-uids)]
     (send! uid [identifier-kw data] 8000)))
 
-(defn broadcast-message
-  [message]
-  (broadcast ::new-message message))
 
 ;;; -------------------------
 ;;; Routes
@@ -57,11 +54,15 @@
 ;; Triggers when a particular user connects and wasn't previously connected .
 (defmethod -message-handler :chsk/uidport-open
   [{:keys [uid client-id]}]
-  (println "New user:" uid client-id))
+  (println "New user:" uid client-id)
+  (send! uid [::chat-backlog @state/messages]))
 
 ;; Ping from clients. Apparently to check that socket is alive.
 (defmethod -message-handler :chsk/ws-ping [_])
-
+;; When a user disconnects.
+(defmethod -message-handler :chsk/uidport-close
+  [data]
+  (println "User disconnected:" data))
 
 
 ;;; Application specific routes, the interesting stuff
@@ -71,7 +72,16 @@
                         #(conj % (assoc ?data :uid uid :message-id (count %))))
         message (last messages)]
     (println message)
-    (broadcast-message message)))
+    (broadcast ::new-message message)))
+
+(defmethod -message-handler :leif-comm.server-comms/ack-entry
+  [{message-id :?data}]
+  (let [messages (swap! state/messages
+                        #(assoc % message-id (-> (get % message-id)
+                                                 (assoc :acked "acked "))))
+        message (get messages message-id)]
+    (broadcast ::modified-message message)))
+(restart-router! :a)
 
 
 ;;; -------------------------

@@ -30,13 +30,13 @@
 
 (defmethod -message-handler :default ; Unhandled message.
   [{:as ev-msg :keys [event]}]
-  (println "Unhandled event: %s" event))
+  (println "Unhandled event: " event))
 
 (defmethod -message-handler :chsk/state
   ;; Indicates when Sente is ready client-side.
   [{:keys [?data]}]
   (if (= ?data {:first-open? true})
-    (println "Channel socket opened: %s" (clj->js ?data))))
+    (println "Channel socket opened: " ?data)))
 
 (defmethod -message-handler :chsk/handshake
   ;; Handshake for WebSocket or long-poll.
@@ -49,7 +49,18 @@
 
 (defmethod -message-handler :leif-comm.sente-routes/new-message
   [{:keys [?data]}]
-  (swap! state/chat-log conj ?data))
+  (swap! state/chat-log conj {(:message-id ?data) ?data}))
+
+(defmethod -message-handler :leif-comm.sente-routes/chat-backlog
+  [{:keys [?data]}]
+  (reset! state/chat-log (into {} (map (juxt :message-id #(assoc % :backlog "backlog ")) ?data))))
+
+(defmethod -message-handler :leif-comm.sente-routes/modified-message
+  [{:keys [?data]}]
+  (println ?data)
+  (swap! state/chat-log assoc (:message-id ?data) ?data))
+
+
 
 ;;; -------------------------
 ;;; Router lifecycle.
@@ -76,3 +87,7 @@
   "Send a message to the chat room"
   [text]
   (send! [::send-chat {:text text :author @state/name-atom}]))
+
+(defn ack-entry
+  [message-id]
+  (send! [::ack-entry message-id]))

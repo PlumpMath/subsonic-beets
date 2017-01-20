@@ -88,15 +88,18 @@
 
 
 (defn chat-log-entry
-  [{:keys [message-id author text] :as data}]
-  [:p (str author ": " text)])
+  [{:keys [message-id author text acked backlog] :as data}]
+  [:p {:on-click #(server-comms/ack-entry message-id)
+       :class (str acked backlog)}
+   (str author ": " text)])
 
 (defn scroll-to-bottom
   "Scroll the given dom-node to the bottom."
   [dom-node]
   (let [last-child-index (- (.-childElementCount dom-node) 1)
         last-child    (aget (.-childNodes dom-node) last-child-index)]
-    (.scrollIntoView dom-node (clj->js {:behavior "smooth"}))))
+    (when last-child
+      (.scrollIntoView last-child (clj->js {:behavior "smooth"})))))
 
 (defn chat-log
   []
@@ -108,7 +111,7 @@
       :reagent-render
       (fn [opts]
         [:ul {:id "received"}
-         (for [c @state/chat-log]
+         (for [c (vals @state/chat-log)]
            ^{:key (:message-id c)} [chat-log-entry c])])})))
 
 (defn chat []
