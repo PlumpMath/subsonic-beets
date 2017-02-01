@@ -81,7 +81,6 @@
                                                  (assoc :acked "acked "))))
         message (get messages message-id)]
     (broadcast ::modified-message message)))
-(restart-router! :a)
 
 
 ;;; -------------------------
