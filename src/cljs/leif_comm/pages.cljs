@@ -89,8 +89,8 @@
 
 (defn chat-log-entry
   [{:keys [message-id author text acked backlog] :as data}]
-  [:p {:on-click #(server-comms/ack-entry message-id)
-       :class (str acked backlog)}
+  [:li {:on-click #(server-comms/ack-entry message-id)
+       :class (str "chat-log-entry " acked backlog)}
    (str author ": " text)])
 
 (defn scroll-to-bottom
