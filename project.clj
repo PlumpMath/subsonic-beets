@@ -1,6 +1,6 @@
-(defproject leif-comm "0.1.0"
-  :description "Real time JSON data communication between browsers."
-  :url "https://github.com/Rovanion/leif-comm"
+(defproject subsonic-beets "0.1.0"
+  :description "A subsonic server implementation feeding off of data from a beets db."
+  :url "https://github.com/Rovanion/subsonic-beets"
   :license {:name "AGPLv3"
             :url  "http://www.gnu.org/licenses/agpl-3.0.html"}
 
@@ -30,14 +30,14 @@
             [lein-asset-minifier "0.2.7"
              :exclusions [org.clojure/clojure]]]
 
-  :ring {:handler      leif-comm.handler/app
-         :uberwar-name "leif-comm.war"}
+  :ring {:handler      subsonic-beets.handler/app
+         :uberwar-name "subsonic-beets.war"}
 
   :min-lein-version "2.7.1"
 
-  :uberjar-name "leif-comm.jar"
+  :uberjar-name "subsonic-beets.jar"
 
-  :main leif-comm.server
+  :main subsonic-beets.server
 
   :clean-targets ^{:protect false}
   [:target-path
@@ -56,16 +56,16 @@
              :server-port      3449
              :nrepl-port       7002
              :css-dirs         ["resources/public/css"]
-             :ring-handler     leif-comm.handler/app
+             :ring-handler     subsonic-beets.handler/app
              :nrepl-middleware ["cider.nrepl/cider-middleware"
                                 "cemerick.piggieback/wrap-cljs-repl"]}
 
   :cljsbuild {:builds
               {:dev
                {:source-paths ["src/cljs" "src/cljc" "env/dev/cljs"]
-                :figwheel     {:on-jsload "leif-comm.core/on-js-reload"
+                :figwheel     {:on-jsload "subsonic-beets.core/on-js-reload"
                                :open-urls ["http://localhost:3449/chat"]}
-                :compiler     {:main                 leif-comm.dev
+                :compiler     {:main                 subsonic-beets.dev
                                :output-to            "target/cljsbuild/public/js/app.js"
                                :output-dir           "target/cljsbuild/public/js/out"
                                :asset-path           "/js/out"
@@ -76,7 +76,7 @@
                :min
                {:source-paths ["src/cljs" "src/cljc"]
                 :compiler     {:output-to     "target/cljsbuild/public/js/app.js"
-                               :main          leif-comm.core
+                               :main          subsonic-beets.core
                                :optimizations :advanced
                                :pretty-print  false}}}}
 
@@ -98,7 +98,7 @@
               :cljsbuild    {:builds {:dev
                                       {:source-paths ["env/dev/cljs"]
                                        :compiler
-                                       {:main          "leif-comm.dev"
+                                       {:main          "subsonic-beets.dev"
                                         :pretty-print  false}}}}}}
              :uberjar
              {:hooks        [minify-assets.plugin/hooks]
@@ -111,6 +111,6 @@
                              :builds {:min
                                       {:source-paths ["env/prod/cljs"]
                                        :compiler
-                                       {:main          "leif-comm.prod"
+                                       {:main          "subsonic-beets.prod"
                                         :optimizations :advanced
                                         :pretty-print  false}}}}}})

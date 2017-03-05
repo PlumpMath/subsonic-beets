@@ -1,4 +1,4 @@
-(ns leif-comm.util)
+(ns subsonic-beets.util)
 
 (defn foo-cljc [x]
   "I don't do a whole lot."

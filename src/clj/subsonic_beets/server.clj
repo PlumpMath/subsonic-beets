@@ -1,5 +1,5 @@
-(ns leif-comm.server
-  (:require [leif-comm.handler :refer [app]]
+(ns subsonic-beets.server
+  (:require [subsonic-beets.handler :refer [app]]
             [config.core :refer [env]]
             [ring.adapter.jetty :refer [run-jetty]])
   (:gen-class))

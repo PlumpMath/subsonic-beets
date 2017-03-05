@@ -1,10 +1,10 @@
-(ns leif-comm.core
+(ns subsonic-beets.core
     (:require [reagent.core :as reagent :refer [atom]]
               [reagent.session :as session]
               [secretary.core :as secretary]
               [accountant.core :as accountant]
-              [leif-comm.server-comms :as server-comms]
-              [leif-comm.pages :as pages]))
+              [subsonic-beets.server-comms :as server-comms]
+              [subsonic-beets.pages :as pages]))
 
 ;;; -------------------------
 ;;; State

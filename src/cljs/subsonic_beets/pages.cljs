@@ -1,8 +1,8 @@
-(ns leif-comm.pages
+(ns subsonic-beets.pages
   (:require [reagent.core :as reagent :refer [atom]]
             [accountant.core :as accountant]
-            [leif-comm.state :as state]
-            [leif-comm.server-comms :as server-comms]))
+            [subsonic-beets.state :as state]
+            [subsonic-beets.server-comms :as server-comms]))
 
 (enable-console-print!)
 (defn atom-field [atom placeholder type]

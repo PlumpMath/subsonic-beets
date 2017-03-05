@@ -1,4 +1,4 @@
-(ns leif-comm.middleware
+(ns subsonic-beets.middleware
   (:require [ring.middleware.defaults :refer [site-defaults wrap-defaults]]))
 
 (defn wrap-middleware [handler]

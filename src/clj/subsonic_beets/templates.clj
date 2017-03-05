@@ -1,4 +1,4 @@
-(ns leif-comm.templates
+(ns subsonic-beets.templates
   (:require [hiccup.page :refer [include-js include-css html5]]
             [config.core :refer [env]]))
 

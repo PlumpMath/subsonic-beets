@@ -1,4 +1,4 @@
-(ns leif-comm.state
+(ns subsonic-beets.state
   (:require [reagent.core :as reagent :refer [atom]]))
 
 

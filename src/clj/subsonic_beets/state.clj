@@ -1,3 +1,3 @@
-(ns leif-comm.state)
+(ns subsonic-beets.state)
 
 (defonce messages (atom []))

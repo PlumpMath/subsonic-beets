@@ -1,6 +1,6 @@
-(ns leif-comm.server-comms
+(ns subsonic-beets.server-comms
   (:require [taoensso.sente      :as sente]
-            [leif-comm.state :as state]
+            [subsonic-beets.state :as state]
             [reagent.core :as reagent :refer [atom]]))
 
 
@@ -47,15 +47,15 @@
 
 ;;; Application specific routes
 
-(defmethod -message-handler :leif-comm.sente-routes/new-message
+(defmethod -message-handler :subsonic-beets.sente-routes/new-message
   [{:keys [?data]}]
   (swap! state/chat-log conj {(:message-id ?data) ?data}))
 
-(defmethod -message-handler :leif-comm.sente-routes/chat-backlog
+(defmethod -message-handler :subsonic-beets.sente-routes/chat-backlog
   [{:keys [?data]}]
   (reset! state/chat-log (into {} (map (juxt :message-id #(assoc % :backlog "backlog ")) ?data))))
 
-(defmethod -message-handler :leif-comm.sente-routes/modified-message
+(defmethod -message-handler :subsonic-beets.sente-routes/modified-message
   [{:keys [?data]}]
   (println ?data)
   (swap! state/chat-log assoc (:message-id ?data) ?data))

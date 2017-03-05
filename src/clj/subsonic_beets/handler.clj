@@ -1,10 +1,10 @@
-(ns leif-comm.handler
+(ns subsonic-beets.handler
   (:require [compojure.core            :refer [GET POST defroutes]]
             [compojure.route           :refer [not-found resources]]
-            [leif-comm.middleware   :refer [wrap-middleware]]
-            [leif-comm.templates    :refer [loading-page]]
-            [leif-comm.broadcasting :refer [start-broadcaster! broadcast!]]
-            [leif-comm.sente-routes     :as sente-routes]
+            [subsonic-beets.middleware   :refer [wrap-middleware]]
+            [subsonic-beets.templates    :refer [loading-page]]
+            [subsonic-beets.broadcasting :refer [start-broadcaster! broadcast!]]
+            [subsonic-beets.sente-routes     :as sente-routes]
             [config.core               :refer [env]]))
 
 

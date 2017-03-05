@@ -1,5 +1,5 @@
-(ns leif-comm.sente-routes
-  (:require [leif-comm.state :as state]
+(ns subsonic-beets.sente-routes
+  (:require [subsonic-beets.state :as state]
             [taoensso.sente :as sente]
             [taoensso.sente.server-adapters.http-kit
              :refer [sente-web-server-adapter]]))
@@ -66,7 +66,7 @@
 
 
 ;;; Application specific routes, the interesting stuff
-(defmethod -message-handler :leif-comm.server-comms/send-chat
+(defmethod -message-handler :subsonic-beets.server-comms/send-chat
   [{:keys [uid event ?data]}]
   (let [messages (swap! state/messages
                         #(conj % (assoc ?data :uid uid :message-id (count %))))
@@ -74,7 +74,7 @@
     (println message)
     (broadcast ::new-message message)))
 
-(defmethod -message-handler :leif-comm.server-comms/ack-entry
+(defmethod -message-handler :subsonic-beets.server-comms/ack-entry
   [{message-id :?data}]
   (let [messages (swap! state/messages
                         #(assoc % message-id (-> (get % message-id)

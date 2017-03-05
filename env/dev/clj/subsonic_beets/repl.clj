@@ -1,5 +1,5 @@
-(ns leif-comm.repl
-  (:use leif-comm.handler
+(ns subsonic-beets.repl
+  (:use subsonic-beets.handler
         ring.server.standalone
         [ring.middleware file-info file]))
 

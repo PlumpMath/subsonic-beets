@@ -1,6 +1,6 @@
 # Leif-comm
 
-[![Build Status](https://travis-ci.org/Rovanion/leif-comm.svg?branch=master)](https://travis-ci.org/Rovanion/leif-comm)
+[![Build Status](https://travis-ci.org/Rovanion/subsonic-beets.svg?branch=master)](https://travis-ci.org/Rovanion/subsonic-beets)
 
 Small custom chat program for theater purposes.
 
